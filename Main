@@ -63,7 +63,28 @@ AuraUI.Options = {}
 AuraUI.Toggled = true
 AuraUI.ThemeObjects = {}
 
+AuraUI.Sounds = {
+    Hover = "rbxassetid://18926058970",
+    Click = "rbxassetid://140387697208266",
+    MenuOpen = "rbxassetid://139821129588664",
+    Toggle = "rbxassetid://99801946430731",
+    Slide = "rbxassetid://86183360052690"
+}
+
 -- Utility Functions
+local function PlaySound(id, vol, pitch)
+    task.spawn(function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = id
+        sound.Volume = vol or 0.3
+        sound.PlaybackSpeed = pitch or 1
+        sound.Parent = CoreGui
+        sound:Play()
+        sound.Ended:Wait()
+        sound:Destroy()
+    end)
+end
+
 local function CreateTween(instance, properties, duration, style, direction)
     local tweenInfo = TweenInfo.new(duration or 0.2, style or Enum.EasingStyle.Quart, direction or Enum.EasingDirection.Out)
     local tween = TweenService:Create(instance, tweenInfo, properties)
@@ -364,6 +385,7 @@ function AuraUI:CreateWindow(config)
         WindowData.Tabs[name] = {Btn = TabBtn, Title = Title, Icon = Icon, Indicator = Indicator, Page = Page}
 
         TabBtn.MouseButton1Click:Connect(function()
+            PlaySound(AuraUI.Sounds.Click, 0.4, 1.2)
             for tName, data in pairs(WindowData.Tabs) do
                 if tName == name then
                     WindowData.CurrentTab = name
@@ -506,10 +528,11 @@ function AuraUI:CreateWindow(config)
 
                 f.MouseButton1Click:Connect(function()
                     T.Value = not T.Value
+                    PlaySound(AuraUI.Sounds.Toggle, 0.3, T.Value and 1.1 or 0.9)
                     updateAnim()
                     if opts.Callback then opts.Callback(T.Value) end
                 end)
-                f.MouseEnter:Connect(function() CreateTween(tStroke, {Color = AuraUI.Theme.TextMuted}, 0.2) end)
+                f.MouseEnter:Connect(function() PlaySound(AuraUI.Sounds.Hover, 0.1, 1); CreateTween(tStroke, {Color = AuraUI.Theme.TextMuted}, 0.2) end)
                 f.MouseLeave:Connect(function() CreateTween(tStroke, {Color = AuraUI.Theme.Border}, 0.2) end)
 
                 updateAnim()
@@ -549,6 +572,7 @@ function AuraUI:CreateWindow(config)
                 Reg(lbl, "TextColor3", "Text")
 
                 f.MouseEnter:Connect(function()
+                    PlaySound(AuraUI.Sounds.Hover, 0.1, 1)
                     CreateTween(f, {BackgroundTransparency = 0.1}, 0.15)
                     CreateTween(stroke, {Color = AuraUI.Theme.Primary}, 0.15)
                 end)
@@ -557,6 +581,7 @@ function AuraUI:CreateWindow(config)
                     CreateTween(stroke, {Color = AuraUI.Theme.Border}, 0.25)
                 end)
                 f.MouseButton1Click:Connect(function()
+                    PlaySound(AuraUI.Sounds.Click, 0.4, 1)
                     CreateRipple(f)
                     if opts.Callback then opts.Callback() end
                 end)
@@ -657,6 +682,7 @@ function AuraUI:CreateWindow(config)
 
                 trigger.InputBegan:Connect(function(inp)
                     if inp.UserInputType == Enum.UserInputType.MouseButton1 then
+                        PlaySound(AuraUI.Sounds.Click, 0.2, 1.3)
                         dragging = true
                         updateDrag(inp)
                         CreateTween(thumb, {Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(1, -8, 0.5, -8)}, 0.15)
@@ -764,9 +790,10 @@ function AuraUI:CreateWindow(config)
                         oc.CornerRadius = UDim.new(0, 6)
                         oc.Parent = opt
 
-                        opt.MouseEnter:Connect(function() CreateTween(opt, {BackgroundTransparency = 0.2}, 0.15) end)
+                        opt.MouseEnter:Connect(function() PlaySound(AuraUI.Sounds.Hover, 0.1, 1); CreateTween(opt, {BackgroundTransparency = 0.2}, 0.15) end)
                         opt.MouseLeave:Connect(function() CreateTween(opt, {BackgroundTransparency = 0.5}, 0.15) end)
                         opt.MouseButton1Click:Connect(function()
+                            PlaySound(AuraUI.Sounds.Click, 0.4, 1.2)
                             D.Value = val
                             title.Text = opts.Title .. ": " .. tostring(val)
                             open = false
@@ -783,6 +810,7 @@ function AuraUI:CreateWindow(config)
 
                 btn.MouseButton1Click:Connect(function()
                     open = not open
+                    PlaySound(AuraUI.Sounds.MenuOpen, 0.3, open and 1.1 or 0.9)
                     refresh()
                     if open then
                         local expand = math.min(150, sLayout.AbsoluteContentSize.Y + 8)

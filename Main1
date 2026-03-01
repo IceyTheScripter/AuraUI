@@ -64,11 +64,12 @@ AuraUI.Options = {}
 AuraUI.Toggled = true
 AuraUI.ThemeObjects = {}
 AuraUI.Sounds = {
-    Hover = "rbxassetid://121115191372938",     -- Soft tick
-    Click = "rbxassetid://140387697208266",     -- Sharp click
-    MenuOpen = "rbxassetid://9120728815",  -- Heavy click
-    Toggle = "rbxassetid://130452431655432",    -- Sharp click (pitched)
-    Slide = "rbxassetid://137695275338351"      -- Soft tick
+    Hover = "rbxassetid://121115191372938",
+    Click = "rbxassetid://140387697208266",
+    MenuOpen = "rbxassetid://9120728815",
+    Toggle = "rbxassetid://130452431655432",  
+    Notify = "rbxassetid://140656175572801", 
+    Slide = "rbxassetid://137695275338351"
 }
 
 -- Utility Functions
@@ -271,12 +272,12 @@ function AuraUI:CreateWindow(config)
 
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Size = UDim2.new(0, 14, 0, 14)
-    CloseBtn.Position = UDim2.new(0, 10, 0, 12)
+    CloseBtn.Position = UDim2.new(1, -24, 0, 14)
     CloseBtn.BackgroundTransparency = 1
-    CloseBtn.Text = "✕"
+    CloseBtn.Text = "X"
     CloseBtn.Font = Enum.Font.GothamBold
     CloseBtn.TextSize = 14
-    CloseBtn.Parent = Sidebar
+    CloseBtn.Parent = MainFrame
     Reg(CloseBtn, "TextColor3", "TextMuted")
     CloseBtn.MouseEnter:Connect(function() CreateTween(CloseBtn, {TextColor3 = AuraUI.Theme.Primary}, 0.2); PlaySound(AuraUI.Sounds.Hover, 0.1, 1) end)
     CloseBtn.MouseLeave:Connect(function() CreateTween(CloseBtn, {TextColor3 = AuraUI.Theme.TextMuted}, 0.2) end)
@@ -882,6 +883,441 @@ function AuraUI:CreateWindow(config)
                 return D
             end
 
+            function SectionData:AddTextInput(id, opts)
+                local T = {Value = opts.Default or ""}
+                
+                local f = Instance.new("Frame")
+                f.Size = UDim2.new(1, 0, 0, 42)
+                f.BackgroundColor3 = AuraUI.Theme.Element
+                f.BackgroundTransparency = 0.5
+                f.Parent = SecContainer
+                Reg(f, "BackgroundColor3", "Element")
+
+                local fc = Instance.new("UICorner")
+                fc.CornerRadius = UDim.new(0, 6)
+                fc.Parent = f
+                
+                local fs = Instance.new("UIStroke")
+                fs.Color = AuraUI.Theme.Border
+                fs.Parent = f
+                Reg(fs, "Color", "Border")
+
+                local title = Instance.new("TextLabel")
+                title.Size = UDim2.new(1, -120, 0, 42)
+                title.Position = UDim2.new(0, 12, 0, 0)
+                title.BackgroundTransparency = 1
+                title.Text = opts.Title
+                title.TextColor3 = AuraUI.Theme.TextMuted
+                title.Font = Enum.Font.GothamMedium
+                title.TextSize = 13
+                title.TextXAlignment = Enum.TextXAlignment.Left
+                title.Parent = f
+                Reg(title, "TextColor3", "TextMuted")
+
+                local input = Instance.new("TextBox")
+                input.Size = UDim2.new(0, 100, 0, 24)
+                input.Position = UDim2.new(1, -108, 0, 9)
+                input.BackgroundColor3 = AuraUI.Theme.Card
+                input.BackgroundTransparency = 0.5
+                input.Text = T.Value
+                input.PlaceholderText = opts.Placeholder or ""
+                input.TextColor3 = AuraUI.Theme.Text
+                input.Font = Enum.Font.Gotham
+                input.TextSize = 12
+                input.Parent = f
+                Reg(input, "BackgroundColor3", "Card")
+                Reg(input, "TextColor3", "Text")
+
+                local ic = Instance.new("UICorner")
+                ic.CornerRadius = UDim.new(0, 4)
+                ic.Parent = input
+
+                local is = Instance.new("UIStroke")
+                is.Color = AuraUI.Theme.Border
+                is.Parent = input
+                Reg(is, "Color", "Border")
+
+                input.Focused:Connect(function()
+                    PlaySound(AuraUI.Sounds.Click, 0.3, 1)
+                    CreateTween(is, {Color = AuraUI.Theme.Primary}, 0.2)
+                end)
+                input.FocusLost:Connect(function()
+                    T.Value = input.Text
+                    CreateTween(is, {Color = AuraUI.Theme.Border}, 0.2)
+                    if opts.Callback then opts.Callback(T.Value) end
+                end)
+
+                AuraUI.Options[id] = T
+                return T
+            end
+
+            function SectionData:AddKeybind(id, opts)
+                local K = {Value = opts.Default or Enum.KeyCode.Unknown}
+                
+                local f = Instance.new("Frame")
+                f.Size = UDim2.new(1, 0, 0, 42)
+                f.BackgroundColor3 = AuraUI.Theme.Element
+                f.BackgroundTransparency = 0.5
+                f.Parent = SecContainer
+                Reg(f, "BackgroundColor3", "Element")
+
+                local fc = Instance.new("UICorner")
+                fc.CornerRadius = UDim.new(0, 6)
+                fc.Parent = f
+                
+                local fs = Instance.new("UIStroke")
+                fs.Color = AuraUI.Theme.Border
+                fs.Parent = f
+                Reg(fs, "Color", "Border")
+
+                local title = Instance.new("TextLabel")
+                title.Size = UDim2.new(1, -100, 0, 42)
+                title.Position = UDim2.new(0, 12, 0, 0)
+                title.BackgroundTransparency = 1
+                title.Text = opts.Title
+                title.TextColor3 = AuraUI.Theme.TextMuted
+                title.Font = Enum.Font.GothamMedium
+                title.TextSize = 13
+                title.TextXAlignment = Enum.TextXAlignment.Left
+                title.Parent = f
+                Reg(title, "TextColor3", "TextMuted")
+
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.new(0, 80, 0, 24)
+                btn.Position = UDim2.new(1, -88, 0, 9)
+                btn.BackgroundColor3 = AuraUI.Theme.Card
+                btn.BackgroundTransparency = 0.5
+                btn.Text = K.Value == Enum.KeyCode.Unknown and "None" or K.Value.Name
+                btn.TextColor3 = AuraUI.Theme.Text
+                btn.Font = Enum.Font.Gotham
+                btn.TextSize = 12
+                btn.Parent = f
+                Reg(btn, "BackgroundColor3", "Card")
+                Reg(btn, "TextColor3", "Text")
+
+                local bc = Instance.new("UICorner")
+                bc.CornerRadius = UDim.new(0, 4)
+                bc.Parent = btn
+
+                local bs = Instance.new("UIStroke")
+                bs.Color = AuraUI.Theme.Border
+                bs.Parent = btn
+                Reg(bs, "Color", "Border")
+
+                local binding = false
+                btn.MouseButton1Click:Connect(function()
+                    binding = true
+                    btn.Text = "..."
+                    CreateTween(bs, {Color = AuraUI.Theme.Primary}, 0.2)
+                    PlaySound(AuraUI.Sounds.Click, 0.3, 1)
+                end)
+
+                UserInputService.InputBegan:Connect(function(inp, gpe)
+                    if binding and inp.UserInputType == Enum.UserInputType.Keyboard then
+                        binding = false
+                        K.Value = inp.KeyCode
+                        btn.Text = K.Value.Name
+                        CreateTween(bs, {Color = AuraUI.Theme.Border}, 0.2)
+                        PlaySound(AuraUI.Sounds.Hover, 0.3, 1.2)
+                        if opts.Callback then opts.Callback(K.Value) end
+                    elseif not binding and not gpe and inp.KeyCode == K.Value and K.Value ~= Enum.KeyCode.Unknown and opts.OnPress then
+                        opts.OnPress()
+                    end
+                end)
+
+                AuraUI.Options[id] = K
+                return K
+            end
+
+            function SectionData:AddMultiDropdown(id, opts)
+                local MD = {Value = opts.Default or {}, Values = opts.Values}
+                local open = false
+
+                local f = Instance.new("Frame")
+                f.Size = UDim2.new(1, 0, 0, 42)
+                f.BackgroundColor3 = AuraUI.Theme.Element
+                f.BackgroundTransparency = 0.5
+                f.ClipsDescendants = true
+                f.Parent = SecContainer
+                Reg(f, "BackgroundColor3", "Element")
+
+                local fc = Instance.new("UICorner")
+                fc.CornerRadius = UDim.new(0, 6)
+                fc.Parent = f
+                
+                local fs = Instance.new("UIStroke")
+                fs.Color = AuraUI.Theme.Border
+                fs.Parent = f
+                Reg(fs, "Color", "Border")
+
+                local title = Instance.new("TextLabel")
+                title.Size = UDim2.new(1, -30, 0, 42)
+                title.Position = UDim2.new(0, 12, 0, 0)
+                title.BackgroundTransparency = 1
+                local function getValText()
+                    if #MD.Value == 0 then return "None" end
+                    return table.concat(MD.Value, ", ")
+                end
+                title.Text = opts.Title .. ": " .. getValText()
+                title.TextColor3 = AuraUI.Theme.TextMuted
+                title.Font = Enum.Font.GothamMedium
+                title.TextSize = 13
+                title.TextXAlignment = Enum.TextXAlignment.Left
+                title.TextTruncate = Enum.TextTruncate.AtEnd
+                title.Parent = f
+                Reg(title, "TextColor3", "TextMuted")
+
+                local chevron = Instance.new("TextLabel")
+                chevron.Size = UDim2.new(0, 20, 0, 42)
+                chevron.Position = UDim2.new(1, -26, 0, 0)
+                chevron.BackgroundTransparency = 1
+                chevron.Text = "▼"
+                chevron.TextColor3 = AuraUI.Theme.TextMuted
+                chevron.Font = Enum.Font.Gotham
+                chevron.TextSize = 12
+                chevron.Parent = f
+                Reg(chevron, "TextColor3", "TextMuted")
+
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.new(1, 0, 0, 42)
+                btn.BackgroundTransparency = 1
+                btn.Text = ""
+                btn.Parent = f
+
+                local scroll = Instance.new("ScrollingFrame")
+                scroll.Size = UDim2.new(1, -8, 1, -48)
+                scroll.Position = UDim2.new(0, 4, 0, 44)
+                scroll.BackgroundTransparency = 1
+                scroll.ScrollBarThickness = 2
+                scroll.Parent = f
+                Reg(scroll, "ScrollBarImageColor3", "Border")
+
+                local sLayout = Instance.new("UIListLayout")
+                sLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                sLayout.Padding = UDim.new(0, 4)
+                sLayout.Parent = scroll
+
+                local function refresh()
+                    for _, ch in ipairs(scroll:GetChildren()) do if ch:IsA("TextButton") then ch:Destroy() end end
+                    for _, val in ipairs(MD.Values) do
+                        local isSelected = table.find(MD.Value, val) ~= nil
+                        local opt = Instance.new("TextButton")
+                        opt.Size = UDim2.new(1, 0, 0, 28)
+                        opt.BackgroundColor3 = AuraUI.Theme.Card
+                        opt.BackgroundTransparency = 0.5
+                        opt.Text = "  " .. val
+                        opt.TextColor3 = isSelected and AuraUI.Theme.Primary or AuraUI.Theme.Text
+                        opt.Font = Enum.Font.Gotham
+                        opt.TextSize = 13
+                        opt.TextXAlignment = Enum.TextXAlignment.Left
+                        opt.AutoButtonColor = false
+                        opt.Parent = scroll
+                        
+                        local oc = Instance.new("UICorner")
+                        oc.CornerRadius = UDim.new(0, 6)
+                        oc.Parent = opt
+                        
+                        local chk = Instance.new("Frame")
+                        chk.Size = UDim2.new(0, 14, 0, 14)
+                        chk.Position = UDim2.new(1, -22, 0.5, -7)
+                        chk.BackgroundColor3 = isSelected and AuraUI.Theme.Primary or AuraUI.Theme.Element
+                        chk.BorderSizePixel = 0
+                        chk.Parent = opt
+                        local ckc = Instance.new("UICorner") ckc.CornerRadius = UDim.new(0, 4) ckc.Parent = chk
+
+                        opt.MouseEnter:Connect(function() PlaySound(AuraUI.Sounds.Hover, 0.1, 1); CreateTween(opt, {BackgroundTransparency = 0.2}, 0.15) end)
+                        opt.MouseLeave:Connect(function() CreateTween(opt, {BackgroundTransparency = 0.5}, 0.15) end)
+                        opt.MouseButton1Click:Connect(function()
+                            if isSelected then
+                                table.remove(MD.Value, table.find(MD.Value, val))
+                            else
+                                table.insert(MD.Value, val)
+                            end
+                            PlaySound(AuraUI.Sounds.Toggle, 0.3, isSelected and -1 or 1)
+                            title.Text = opts.Title .. ": " .. getValText()
+                            refresh()
+                            if opts.Callback then opts.Callback(MD.Value) end
+                        end)
+                    end
+                    scroll.CanvasSize = UDim2.new(0, 0, 0, sLayout.AbsoluteContentSize.Y)
+                end
+
+                btn.MouseButton1Click:Connect(function()
+                    open = not open
+                    PlaySound(AuraUI.Sounds.MenuOpen, 0.3, open and 1.1 or -1)
+                    refresh()
+                    if open then
+                        local expand = math.min(150, sLayout.AbsoluteContentSize.Y + 8)
+                        CreateTween(f, {Size = UDim2.new(1, 0, 0, 46 + expand)}, 0.3, Enum.EasingStyle.Quart)
+                        CreateTween(chevron, {Rotation = 180}, 0.3)
+                        CreateTween(title, {TextColor3 = AuraUI.Theme.Text}, 0.2)
+                        CreateTween(fs, {Color = AuraUI.Theme.Primary}, 0.2)
+                    else
+                        CreateTween(f, {Size = UDim2.new(1, 0, 0, 42)}, 0.3, Enum.EasingStyle.Quart)
+                        CreateTween(chevron, {Rotation = 0}, 0.3)
+                        CreateTween(title, {TextColor3 = AuraUI.Theme.TextMuted}, 0.2)
+                        CreateTween(fs, {Color = AuraUI.Theme.Border}, 0.2)
+                    end
+                end)
+                refresh()
+
+                AuraUI.Options[id] = MD
+                return MD
+            end
+
+            function SectionData:AddColorPicker(id, opts)
+                local CP = {Value = opts.Default or Color3.fromRGB(255, 255, 255)}
+                local open = false
+
+                local f = Instance.new("Frame")
+                f.Size = UDim2.new(1, 0, 0, 42)
+                f.BackgroundColor3 = AuraUI.Theme.Element
+                f.BackgroundTransparency = 0.5
+                f.ClipsDescendants = true
+                f.Parent = SecContainer
+                Reg(f, "BackgroundColor3", "Element")
+
+                local fc = Instance.new("UICorner")
+                fc.CornerRadius = UDim.new(0, 6)
+                fc.Parent = f
+                
+                local fs = Instance.new("UIStroke")
+                fs.Color = AuraUI.Theme.Border
+                fs.Parent = f
+                Reg(fs, "Color", "Border")
+
+                local title = Instance.new("TextLabel")
+                title.Size = UDim2.new(1, -60, 0, 42)
+                title.Position = UDim2.new(0, 12, 0, 0)
+                title.BackgroundTransparency = 1
+                title.Text = opts.Title
+                title.TextColor3 = AuraUI.Theme.TextMuted
+                title.Font = Enum.Font.GothamMedium
+                title.TextSize = 13
+                title.TextXAlignment = Enum.TextXAlignment.Left
+                title.Parent = f
+                Reg(title, "TextColor3", "TextMuted")
+
+                local colorDisp = Instance.new("Frame")
+                colorDisp.Size = UDim2.new(0, 24, 0, 24)
+                colorDisp.Position = UDim2.new(1, -36, 0, 9)
+                colorDisp.BackgroundColor3 = CP.Value
+                colorDisp.Parent = f
+                
+                local cdc = Instance.new("UICorner")
+                cdc.CornerRadius = UDim.new(0, 4)
+                cdc.Parent = colorDisp
+
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.new(1, 0, 0, 42)
+                btn.BackgroundTransparency = 1
+                btn.Text = ""
+                btn.Parent = f
+
+                local pickerArea = Instance.new("Frame")
+                pickerArea.Size = UDim2.new(1, -24, 0, 80)
+                pickerArea.Position = UDim2.new(0, 12, 0, 46)
+                pickerArea.BackgroundTransparency = 1
+                pickerArea.Parent = f
+
+                -- R, G, B standard sliders for perfect reliability
+                local r, g, b = math.floor(CP.Value.R*255), math.floor(CP.Value.G*255), math.floor(CP.Value.B*255)
+                
+                local function makeColorSlider(yPos, colorType)
+                    local track = Instance.new("Frame")
+                    track.Size = UDim2.new(1, 0, 0, 12)
+                    track.Position = UDim2.new(0, 0, 0, yPos)
+                    track.BackgroundColor3 = AuraUI.Theme.Card
+                    track.Parent = pickerArea
+                    local tc = Instance.new("UICorner") tc.CornerRadius = UDim.new(1, 0) tc.Parent = track
+                    
+                    local grad = Instance.new("UIGradient")
+                    grad.Parent = track
+                    
+                    local thumb = Instance.new("Frame")
+                    thumb.Size = UDim2.new(0, 12, 0, 16)
+                    thumb.Position = UDim2.new(0, -6, 0.5, -8)
+                    thumb.BackgroundColor3 = Color3.new(1,1,1)
+                    thumb.Parent = track
+                    local thc = Instance.new("UICorner") thc.CornerRadius = UDim.new(0, 4) thc.Parent = thumb
+                    
+                    local trig = Instance.new("TextButton")
+                    trig.Size = UDim2.new(1, 0, 1, 0)
+                    trig.BackgroundTransparency = 1
+                    trig.Text = ""
+                    trig.Parent = track
+                    
+                    return track, grad, thumb, trig
+                end
+
+                local rTrack, rGrad, rThumb, rTrig = makeColorSlider(10, "R")
+                local gTrack, gGrad, gThumb, gTrig = makeColorSlider(35, "G")
+                local bTrack, bGrad, bThumb, bTrig = makeColorSlider(60, "B")
+
+                local function updateGradients()
+                    rGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(0, g, b)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, g, b))})
+                    gGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(r, 0, b)), ColorSequenceKeypoint.new(1, Color3.fromRGB(r, 255, b))})
+                    bGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(r, g, 0)), ColorSequenceKeypoint.new(1, Color3.fromRGB(r, g, 255))})
+                end
+
+                local function setCPVal(newColor)
+                    CP.Value = newColor
+                    colorDisp.BackgroundColor3 = newColor
+                    r, g, b = math.floor(newColor.R*255), math.floor(newColor.G*255), math.floor(newColor.B*255)
+                    rThumb.Position = UDim2.new(newColor.R, -6, 0.5, -8)
+                    gThumb.Position = UDim2.new(newColor.G, -6, 0.5, -8)
+                    bThumb.Position = UDim2.new(newColor.B, -6, 0.5, -8)
+                    updateGradients()
+                    if opts.Callback then opts.Callback(newColor) end
+                end
+
+                local function handleDrag(track, thumb, typeVar, input)
+                    local perc = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+                    if typeVar == "R" then r = math.floor(perc * 255) 
+                    elseif typeVar == "G" then g = math.floor(perc * 255)
+                    else b = math.floor(perc * 255) end
+                    setCPVal(Color3.fromRGB(r, g, b))
+                end
+
+                local draggingR, draggingG, draggingB = false, false, false
+
+                rTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingR = true; PlaySound(AuraUI.Sounds.Slide, 0.1, 1); handleDrag(rTrack, rThumb, "R", inp) end end)
+                gTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingG = true; PlaySound(AuraUI.Sounds.Slide, 0.1, 1); handleDrag(gTrack, gThumb, "G", inp) end end)
+                bTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingB = true; PlaySound(AuraUI.Sounds.Slide, 0.1, 1); handleDrag(bTrack, bThumb, "B", inp) end end)
+                
+                UserInputService.InputEnded:Connect(function(inp)
+                    if inp.UserInputType == Enum.UserInputType.MouseButton1 then
+                        draggingR, draggingG, draggingB = false, false, false
+                    end
+                end)
+                UserInputService.InputChanged:Connect(function(inp)
+                    if inp.UserInputType == Enum.UserInputType.MouseMovement then
+                        if draggingR then handleDrag(rTrack, rThumb, "R", inp) end
+                        if draggingG then handleDrag(gTrack, gThumb, "G", inp) end
+                        if draggingB then handleDrag(bTrack, bThumb, "B", inp) end
+                    end
+                end)
+
+                btn.MouseButton1Click:Connect(function()
+                    open = not open
+                    PlaySound(AuraUI.Sounds.MenuOpen, 0.3, open and 1.1 or -1)
+                    if open then
+                        CreateTween(f, {Size = UDim2.new(1, 0, 0, 136)}, 0.3, Enum.EasingStyle.Quart)
+                        CreateTween(title, {TextColor3 = AuraUI.Theme.Text}, 0.2)
+                        CreateTween(fs, {Color = AuraUI.Theme.Primary}, 0.2)
+                    else
+                        CreateTween(f, {Size = UDim2.new(1, 0, 0, 42)}, 0.3, Enum.EasingStyle.Quart)
+                        CreateTween(title, {TextColor3 = AuraUI.Theme.TextMuted}, 0.2)
+                        CreateTween(fs, {Color = AuraUI.Theme.Border}, 0.2)
+                    end
+                end)
+                
+                setCPVal(CP.Value)
+
+                AuraUI.Options[id] = CP
+                return CP
+            end
+
             return SectionData
         end
 
@@ -909,6 +1345,8 @@ function AuraUI:CreateWindow(config)
 end
 
 function AuraUI:Notify(opts)
+    PlaySound(AuraUI.Sounds.Notify, 0.4, 1)
+    
     local note = Instance.new("Frame")
     note.Size = UDim2.new(0, 280, 0, 60)
     note.Position = UDim2.new(1, 10, 1, -80)

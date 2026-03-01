@@ -180,37 +180,39 @@ function AuraUI:CreateWindow(cfg)
     local mfStroke = Instance.new("UIStroke"); mfStroke.Color = currentTheme.primary; mfStroke.Thickness = 2.5; mfStroke.Transparency = 0.1; mfStroke.Parent = mf
     table.insert(Window._reg, {obj = mfStroke, prop = "Color", key = "primary"})
 
-    -- Subtler Glowing effect
+    -- Aesthetic glow behind the main window
     local glow = Instance.new("ImageLabel")
     glow.Name = "Glow"; glow.BackgroundTransparency = 1; glow.Position = UDim2.new(0, -15, 0, -15); glow.Size = UDim2.new(1, 30, 1, 30)
     glow.ZIndex = 0; glow.Image = "rbxassetid://5028857084"; glow.ImageColor3 = currentTheme.primary; glow.ImageTransparency = 0.5; glow.ScaleType = Enum.ScaleType.Slice; glow.SliceCenter = Rect.new(24, 24, 276, 276); glow.Parent = mf
     table.insert(Window._reg, {obj = glow, prop = "ImageColor3", key = "primary"})
 
-    for i = 1, 12 do createParticle(mf) end
-
-    local topBar = Instance.new("Frame"); topBar.Size = UDim2.new(1, 0, 0, 48); topBar.BackgroundColor3 = currentTheme.topbar; topBar.BorderSizePixel = 0; topBar.ZIndex = 5; topBar.Parent = mf
+    -- Subtle topbar styling (instead of a full block, just a clean gradient or line)
+    local topBar = Instance.new("Frame"); topBar.Size = UDim2.new(1, 0, 0, 40); topBar.BackgroundColor3 = currentTheme.topbar; topBar.BorderSizePixel = 0; topBar.ZIndex = 5; topBar.Parent = mf
     table.insert(Window._reg, {obj = topBar, prop = "BackgroundColor3", key = "topbar"})
-    local tbC = Instance.new("UICorner"); tbC.CornerRadius = UDim.new(0, 12); tbC.Parent = topBar
+    local tbC = Instance.new("UICorner"); tbC.CornerRadius = UDim.new(0, 8); tbC.Parent = topBar
+    -- Square off the bottom of the topbar
+    local tbSquare = Instance.new("Frame"); tbSquare.Size = UDim2.new(1, 0, 0, 8); tbSquare.Position = UDim2.new(0, 0, 1, -8); tbSquare.BackgroundColor3 = currentTheme.topbar; tbSquare.BorderSizePixel = 0; tbSquare.ZIndex = 5; tbSquare.Parent = topBar
+    table.insert(Window._reg, {obj = tbSquare, prop = "BackgroundColor3", key = "topbar"})
 
     local tLbl = Instance.new("TextLabel"); tLbl.Size = UDim2.new(0, 250, 1, 0); tLbl.Position = UDim2.new(0, 15, 0, 0); tLbl.BackgroundTransparency = 1; tLbl.Text = cfg.Title or "Aura UI"
-    tLbl.TextColor3 = currentTheme.text; tLbl.TextSize = 18; tLbl.Font = Enum.Font.GothamBold; tLbl.TextXAlignment = Enum.TextXAlignment.Left; tLbl.ZIndex = 6; tLbl.Parent = topBar
+    tLbl.TextColor3 = currentTheme.text; tLbl.TextSize = 15; tLbl.Font = Enum.Font.GothamMedium; tLbl.TextXAlignment = Enum.TextXAlignment.Left; tLbl.ZIndex = 6; tLbl.Parent = topBar
     table.insert(Window._reg, {obj = tLbl, prop = "TextColor3", key = "text"})
     
     local sbLbl = Instance.new("TextLabel"); sbLbl.Size = UDim2.new(0, 200, 1, 0); sbLbl.Position = UDim2.new(0, 145, 0, 0); sbLbl.BackgroundTransparency = 1; sbLbl.Text = cfg.SubTitle or ""
-    sbLbl.TextColor3 = currentTheme.textDim; sbLbl.TextSize = 12; sbLbl.Font = Enum.Font.GothamMedium; sbLbl.TextXAlignment = Enum.TextXAlignment.Left; sbLbl.ZIndex = 6; sbLbl.Parent = topBar
-    table.insert(Window._reg, {obj = sbLbl, prop = "TextColor3", key = "textDim"})
+    sbLbl.TextColor3 = currentTheme.primary; sbLbl.TextSize = 12; sbLbl.Font = Enum.Font.Gotham; sbLbl.TextXAlignment = Enum.TextXAlignment.Left; sbLbl.ZIndex = 6; sbLbl.Parent = topBar
+    table.insert(Window._reg, {obj = sbLbl, prop = "TextColor3", key = "primary"})
 
-    local bLine = Instance.new("Frame"); bLine.Size = UDim2.new(1, 0, 0, 2); bLine.Position = UDim2.new(0, 0, 1, 0); bLine.BackgroundColor3 = currentTheme.primary; bLine.BorderSizePixel = 0; bLine.ZIndex = 6; bLine.Parent = topBar
+    local bLine = Instance.new("Frame"); bLine.Size = UDim2.new(1, 0, 0, 1); bLine.Position = UDim2.new(0, 0, 1, 0); bLine.BackgroundColor3 = currentTheme.primary; bLine.BackgroundTransparency = 0.5; bLine.BorderSizePixel = 0; bLine.ZIndex = 6; bLine.Parent = topBar
     table.insert(Window._reg, {obj = bLine, prop = "BackgroundColor3", key = "primary"})
 
     local function makeTbBtn(txt, px)
-        local b = Instance.new("TextButton"); b.Size = UDim2.new(0, 32, 0, 32); b.Position = UDim2.new(1, px, 0.5, 0); b.AnchorPoint = Vector2.new(0, 0.5); b.BackgroundColor3 = currentTheme.element
-        b.Text = txt; b.TextColor3 = currentTheme.text; b.TextSize = 18; b.Font = Enum.Font.GothamBold; b.ZIndex = 6; b.Parent = topBar; local bc = Instance.new("UICorner"); bc.CornerRadius = UDim.new(0, 6); bc.Parent = b
-        table.insert(Window._reg, {obj = b, prop = "BackgroundColor3", key = "element"}); table.insert(Window._reg, {obj = b, prop = "TextColor3", key = "text"})
-        b.MouseEnter:Connect(function() tw(b, {BackgroundColor3 = currentTheme.primary}, 0.15) end); b.MouseLeave:Connect(function() tw(b, {BackgroundColor3 = currentTheme.element}, 0.15) end)
+        local b = Instance.new("TextButton"); b.Size = UDim2.new(0, 28, 0, 28); b.Position = UDim2.new(1, px, 0.5, 0); b.AnchorPoint = Vector2.new(0, 0.5); b.BackgroundTransparency = 1
+        b.Text = txt; b.TextColor3 = currentTheme.textDim; b.TextSize = 16; b.Font = Enum.Font.GothamMedium; b.ZIndex = 6; b.Parent = topBar
+        table.insert(Window._reg, {obj = b, prop = "TextColor3", key = "textDim"})
+        b.MouseEnter:Connect(function() tw(b, {TextColor3 = currentTheme.text}, 0.15) end); b.MouseLeave:Connect(function() tw(b, {TextColor3 = currentTheme.textDim}, 0.15) end)
         return b
     end
-    local closeBtn = makeTbBtn("×", -38); local minBtn = makeTbBtn("−", -76)
+    local closeBtn = makeTbBtn("✕", -34); local minBtn = makeTbBtn("−", -64)
 
     -- Window Dragging
     local dragging, dragInp, dragStart, startPos
@@ -271,15 +273,15 @@ function AuraUI:CreateWindow(cfg)
     UserInputService.InputBegan:Connect(function(inp, gp) if not gp and inp.KeyCode == toggleKey then toggleMin() end end)
 
     -- Tab Containers
-    local tabW = cfg.TabWidth or 150
-    local tCon = Instance.new("Frame"); tCon.Size = UDim2.new(0, tabW, 1, -52); tCon.Position = UDim2.new(0, 4, 0, 52); tCon.BackgroundTransparency = 1; tCon.ZIndex = 3; tCon.Parent = mf
-    local tl = Instance.new("UIListLayout"); tl.SortOrder = Enum.SortOrder.LayoutOrder; tl.Padding = UDim.new(0, 8); tl.Parent = tCon; local tp = Instance.new("UIPadding"); tp.PaddingTop = UDim.new(0, 8); tp.PaddingLeft = UDim.new(0, 4); tp.PaddingRight = UDim.new(0, 4); tp.Parent = tCon
+    local tabW = cfg.TabWidth or 160
+    local tCon = Instance.new("ScrollingFrame"); tCon.Size = UDim2.new(0, tabW, 1, -48); tCon.Position = UDim2.new(0, 0, 0, 44); tCon.BackgroundTransparency = 1; tCon.ZIndex = 3; tCon.ScrollBarThickness = 0; tCon.Parent = mf
+    local tl = Instance.new("UIListLayout"); tl.SortOrder = Enum.SortOrder.LayoutOrder; tl.Padding = UDim.new(0, 4); tl.Parent = tCon; local tp = Instance.new("UIPadding"); tp.PaddingTop = UDim.new(0, 8); tp.PaddingLeft = UDim.new(0, 10); tp.PaddingRight = UDim.new(0, 10); tp.Parent = tCon
+    tl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() tCon.CanvasSize = UDim2.new(0, 0, 0, tl.AbsoluteContentSize.Y + 16) end)
     
-    local div = Instance.new("Frame"); div.Size = UDim2.new(0, 2, 1, -66); div.Position = UDim2.new(0, tabW + 8, 0, 58); div.BackgroundColor3 = currentTheme.primary; div.BackgroundTransparency = 0.5; div.BorderSizePixel = 0; div.Parent = mf
+    local div = Instance.new("Frame"); div.Size = UDim2.new(0, 1, 1, -56); div.Position = UDim2.new(0, tabW + 6, 0, 48); div.BackgroundColor3 = currentTheme.primary; div.BackgroundTransparency = 0.7; div.BorderSizePixel = 0; div.Parent = mf
     table.insert(Window._reg, {obj = div, prop = "BackgroundColor3", key = "primary"})
-    local divC = Instance.new("UICorner"); divC.CornerRadius = UDim.new(1, 0); divC.Parent = div
 
-    local cCon = Instance.new("Frame"); cCon.Size = UDim2.new(1, -(tabW + 20), 1, -60); cCon.Position = UDim2.new(0, tabW + 16, 0, 56); cCon.BackgroundTransparency = 1; cCon.ClipsDescendants = true; cCon.Parent = mf
+    local cCon = Instance.new("Frame"); cCon.Size = UDim2.new(1, -(tabW + 20), 1, -52); cCon.Position = UDim2.new(0, tabW + 14, 0, 46); cCon.BackgroundTransparency = 1; cCon.ClipsDescendants = true; cCon.Parent = mf
 
     -- Setup Theme Applier
     function Window:SetTheme(name)
@@ -296,31 +298,33 @@ function AuraUI:CreateWindow(cfg)
     function Window:AddTab(tCfg)
         local Tab = {Name = tCfg.Title or "Tab", Elements = {}}
         
-        local btn = Instance.new("TextButton"); btn.Size = UDim2.new(1, 0, 0, 38); btn.BackgroundColor3 = currentTheme.element; btn.Text = "  " .. Tab.Name; btn.TextColor3 = currentTheme.textDim; btn.TextSize = 14; btn.Font = Enum.Font.GothamSemibold; btn.TextXAlignment = Enum.TextXAlignment.Left; btn.Parent = tCon
-        local bc = Instance.new("UICorner"); bc.CornerRadius = UDim.new(0, 8); bc.Parent = btn
-        table.insert(Window._reg, {obj = btn, prop = "BackgroundColor3", key = "element"})
-        local str = Instance.new("Frame"); str.Size = UDim2.new(0, 3, 0.6, 0); str.Position = UDim2.new(0, 0, 0.2, 0); str.BackgroundColor3 = currentTheme.primary; str.BackgroundTransparency = 1; str.BorderSizePixel = 0; str.Parent = btn
-        local sc = Instance.new("UICorner"); sc.CornerRadius = UDim.new(0, 4); sc.Parent = str
+        -- Slick transparent tab buttons that only highlight on hover
+        local btn = Instance.new("TextButton"); btn.Size = UDim2.new(1, 0, 0, 32); btn.BackgroundTransparency = 1; btn.Text = "  " .. Tab.Name; btn.TextColor3 = currentTheme.textDim; btn.TextSize = 13; btn.Font = Enum.Font.GothamMedium; btn.TextXAlignment = Enum.TextXAlignment.Left; btn.Parent = tCon
+        local bc = Instance.new("UICorner"); bc.CornerRadius = UDim.new(0, 6); bc.Parent = btn
+        
+        -- Active indicator dot instead of a strip
+        local str = Instance.new("Frame"); str.Size = UDim2.new(0, 4, 0, 4); str.Position = UDim2.new(1, -12, 0.5, 0); str.AnchorPoint = Vector2.new(0, 0.5); str.BackgroundColor3 = currentTheme.primary; str.BackgroundTransparency = 1; str.BorderSizePixel = 0; str.Parent = btn
+        local sc = Instance.new("UICorner"); sc.CornerRadius = UDim.new(1, 0); sc.Parent = str
         table.insert(Window._reg, {obj = str, prop = "BackgroundColor3", key = "primary"})
 
-        local sFrame = Instance.new("ScrollingFrame"); sFrame.Size = UDim2.new(1, 0, 1, 0); sFrame.BackgroundTransparency = 1; sFrame.ScrollBarThickness = 3; sFrame.ScrollBarImageColor3 = currentTheme.primary; sFrame.Visible = false; sFrame.Parent = cCon
+        local sFrame = Instance.new("ScrollingFrame"); sFrame.Size = UDim2.new(1, 0, 1, 0); sFrame.BackgroundTransparency = 1; sFrame.ScrollBarThickness = 2; sFrame.ScrollBarImageColor3 = currentTheme.primary; sFrame.Visible = false; sFrame.Parent = cCon
         table.insert(Window._reg, {obj = sFrame, prop = "ScrollBarImageColor3", key = "primary"})
-        local sl = Instance.new("UIListLayout"); sl.SortOrder = Enum.SortOrder.LayoutOrder; sl.Padding = UDim.new(0, 6); sl.Parent = sFrame
-        local sp = Instance.new("UIPadding"); sp.PaddingTop = UDim.new(0, 4); sp.PaddingRight = UDim.new(0, 6); sp.PaddingBottom = UDim.new(0, 6); sp.Parent = sFrame
-        sl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() sFrame.CanvasSize = UDim2.new(0, 0, 0, sl.AbsoluteContentSize.Y + 8) end)
+        local sl = Instance.new("UIListLayout"); sl.SortOrder = Enum.SortOrder.LayoutOrder; sl.Padding = UDim.new(0, 8); sl.Parent = sFrame
+        local sp = Instance.new("UIPadding"); sp.PaddingTop = UDim.new(0, 6); sp.PaddingRight = UDim.new(0, 8); sp.PaddingBottom = UDim.new(0, 6); sp.Parent = sFrame
+        sl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() sFrame.CanvasSize = UDim2.new(0, 0, 0, sl.AbsoluteContentSize.Y + 12) end)
 
         btn.MouseButton1Click:Connect(function() playSound(Sounds.click, 0.4, 1); Window:SelectTab(Tab.Name) end)
-        btn.MouseEnter:Connect(function() if Window.CurrentTab ~= Tab.Name then playSound(Sounds.hover, 0.2, 1.1); tw(btn, {BackgroundColor3 = currentTheme.topbar}, 0.15) end end)
-        btn.MouseLeave:Connect(function() if Window.CurrentTab ~= Tab.Name then tw(btn, {BackgroundColor3 = currentTheme.element}, 0.15) end end)
+        btn.MouseEnter:Connect(function() if Window.CurrentTab ~= Tab.Name then playSound(Sounds.hover, 0.2, 1.1); tw(btn, {BackgroundTransparency = 0.85, BackgroundColor3 = currentTheme.topbar}, 0.15) end end)
+        btn.MouseLeave:Connect(function() if Window.CurrentTab ~= Tab.Name then tw(btn, {BackgroundTransparency = 1}, 0.15) end end)
 
         Window.Tabs[Tab.Name] = {Btn = btn, Str = str, Frame = sFrame}
 
         local function baseObj(h)
-            local f = Instance.new("Frame"); f.Size = UDim2.new(1, 0, 0, h); f.BackgroundColor3 = currentTheme.element; f.Parent = sFrame
+            local f = Instance.new("Frame"); f.Size = UDim2.new(1, 0, 0, h); f.BackgroundColor3 = currentTheme.topbar; f.BackgroundTransparency = 0.5; f.Parent = sFrame
             local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 6); c.Parent = f
-            local s = Instance.new("UIStroke"); s.Color = currentTheme.primary; s.Thickness = 1.5; s.Transparency = 0.6; s.Parent = f
-            table.insert(Window._reg, {obj = f, prop = "BackgroundColor3", key = "element"}); table.insert(Window._reg, {obj = s, prop = "Color", key = "primary"})
-            f.MouseEnter:Connect(function() tw(s, {Transparency = 0.2}, 0.15) end); f.MouseLeave:Connect(function() tw(s, {Transparency = 0.6}, 0.15) end)
+            local s = Instance.new("UIStroke"); s.Color = currentTheme.primary; s.Thickness = 1; s.Transparency = 0.8; s.Parent = f
+            table.insert(Window._reg, {obj = f, prop = "BackgroundColor3", key = "topbar"}); table.insert(Window._reg, {obj = s, prop = "Color", key = "primary"})
+            f.MouseEnter:Connect(function() tw(s, {Transparency = 0.3}, 0.2); tw(f, {BackgroundTransparency = 0.1}, 0.2) end); f.MouseLeave:Connect(function() tw(s, {Transparency = 0.8}, 0.2); tw(f, {BackgroundTransparency = 0.5}, 0.2) end)
             return f
         end
 
@@ -329,18 +333,16 @@ function AuraUI:CreateWindow(cfg)
             l.BackgroundTransparency = 1; l.Text = txt; l.Font = f; l.TextColor3 = col; l.TextSize = s; l.TextXAlignment = ax or Enum.TextXAlignment.Left; l.Parent = p; return l
         end
 
-        function Tab:AddButton(c)
-            local hasD = c.Description; local f = baseObj(hasD and 48 or 38)
-            local t = addLbl(f, c.Title or "Button", 14, Enum.Font.GothamSemibold, currentTheme.text, nil, 12, hasD and 8 or 11)
+        function Tab:AddButton(n, c)
+            local hasD = false; local f = baseObj(32)
+            local t = addLbl(f, n, 13, Enum.Font.GothamMedium, currentTheme.text, nil, 12, 8)
+            t.Size = UDim2.new(1, -20, 0, 16)
             table.insert(Window._reg, {obj = t, prop = "TextColor3", key = "text"})
-            if hasD then
-                local d = addLbl(f, c.Description, 11, Enum.Font.Gotham, currentTheme.textDim, nil, 12, 26)
-                table.insert(Window._reg, {obj = d, prop = "TextColor3", key = "textDim"})
-            end
-            local a = addLbl(f, "›", 16, Enum.Font.GothamBold, currentTheme.primary, Enum.TextXAlignment.Right, -32, 0); a.Size = UDim2.new(0, 24, 1, 0); a.Position = UDim2.new(1, -30, 0, 0)
-            table.insert(Window._reg, {obj = a, prop = "TextColor3", key = "primary"})
+            
             local b = Instance.new("TextButton"); b.Size = UDim2.new(1, 0, 1, 0); b.BackgroundTransparency = 1; b.Text = ""; b.ZIndex = 5; b.Parent = f
-            b.MouseButton1Click:Connect(function() playSound(Sounds.click, 0.4, 1); tw(f, {BackgroundColor3 = currentTheme.primary}, 0.08); task.wait(0.1); tw(f, {BackgroundColor3 = currentTheme.element}, 0.2); if c.Callback then c.Callback() end end)
+            b.MouseEnter:Connect(function() playSound(Sounds.hover, 0.2, 1); tw(f, {BackgroundColor3 = currentTheme.primary, BackgroundTransparency = 0.5}, 0.15) end)
+            b.MouseLeave:Connect(function() tw(f, {BackgroundColor3 = currentTheme.topbar, BackgroundTransparency = 0.5}, 0.15) end)
+            b.MouseButton1Click:Connect(function() playSound(Sounds.click, 0.4, 1); createRipple(b); if c.Callback then c.Callback() end end)
         end
 
         function Tab:AddToggle(n, c)
@@ -401,44 +403,108 @@ function AuraUI:CreateWindow(cfg)
             Sl:SetValue(Sl.Value); AuraUI.Options[n] = Sl; return Sl
         end
 
-        function Tab:AddDropdown(n, c)
-            local D = {Value = c.Default, Values = c.Values or {}, Name = n, Type = "Dropdown"}
-            local opn = false; local f = baseObj(38); f.ClipsDescendants = false
-            local t = addLbl(f, c.Title or n, 13, Enum.Font.GothamSemibold, currentTheme.text, nil, 12, 0); t.Size = UDim2.new(1, -40, 1, 0)
+        function Tab:AddMultiDropdown(n, c)
+            local MD = {Value = c.Default or {}, Items = c.Values or {}, Name = n, Type = "MultiDropdown"}
+            local opn = false; local f = baseObj(36); f.ClipsDescendants = false
+            local t = addLbl(f, c.Title or n, 12, Enum.Font.GothamMedium, currentTheme.text, nil, 14, 0); t.Size = UDim2.new(1, -90, 1, 0)
             table.insert(Window._reg, {obj = t, prop = "TextColor3", key = "text"})
-            local arr = addLbl(f, "▼", 11, Enum.Font.GothamBold, currentTheme.primary, Enum.TextXAlignment.Right, 0, 0); arr.Size = UDim2.new(0, 22, 1, 0); arr.Position = UDim2.new(1, -28, 0, 0)
+            
+            local function count() local x=0; for _ in pairs(MD.Value) do x=x+1 end; return x end
+            local ct = addLbl(f, count() .. " selected", 11, Enum.Font.Gotham, currentTheme.textDim, Enum.TextXAlignment.Right, 0, 0); ct.Size = UDim2.new(0, 60, 1, 0); ct.Position = UDim2.new(1, -88, 0, 0)
+            table.insert(Window._reg, {obj = ct, prop = "TextColor3", key = "textDim"})
+
+            local arr = addLbl(f, "▼", 10, Enum.Font.Gotham, currentTheme.primary, Enum.TextXAlignment.Right, 0, 0); arr.Size = UDim2.new(0, 22, 1, 0); arr.Position = UDim2.new(1, -28, 0, 0)
+            table.insert(Window._reg, {obj = arr, prop = "TextColor3", key = "primary"})
+
+            local scr = Instance.new("ScrollingFrame"); scr.Size = UDim2.new(1, 0, 0, 0); scr.Position = UDim2.new(0, 0, 0, 40); scr.BackgroundColor3 = currentTheme.background; scr.BorderSizePixel = 0; scr.ScrollBarThickness = 2; scr.Visible = false; scr.ZIndex = 12; scr.Parent = f
+            table.insert(Window._reg, {obj = scr, prop = "BackgroundColor3", key = "background"})
+            local scrc = Instance.new("UICorner"); scrc.CornerRadius = UDim.new(0, 6); scrc.Parent = scr
+            local scrs = Instance.new("UIStroke"); scrs.Color = currentTheme.primary; scrs.Thickness = 1; scrs.Transparency = 0.5; scrs.Parent = scr
+            table.insert(Window._reg, {obj = scrs, prop = "Color", key = "primary"})
+
+            local ssl = Instance.new("UIListLayout"); ssl.SortOrder = Enum.SortOrder.LayoutOrder; ssl.Padding = UDim.new(0, 2); ssl.Parent = scr
+            ssl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() scr.CanvasSize = UDim2.new(0, 0, 0, ssl.AbsoluteContentSize.Y + 8) end)
+
+            local function bld()
+                for _, ch in ipairs(scr:GetChildren()) do if ch:IsA("Frame") then ch:Destroy() end end
+                for _, itm in ipairs(MD.Items) do
+                    local rw = Instance.new("Frame"); rw.Size = UDim2.new(1, -8, 0, 26); rw.Position = UDim2.new(0, 4, 0, 0); rw.BackgroundColor3 = currentTheme.topbar; rw.ZIndex = 13; rw.Parent = scr; local rc = Instance.new("UICorner"); rc.CornerRadius = UDim.new(0, 4); rc.Parent = rw
+                    table.insert(Window._reg, {obj = rw, prop = "BackgroundColor3", key = "topbar"})
+                    local tl = Instance.new("TextLabel"); tl.Size = UDim2.new(1, -30, 1, 0); tl.Position = UDim2.new(0, 8, 0, 0); tl.BackgroundTransparency = 1; tl.Text = itm; tl.TextColor3 = MD.Value[itm] and currentTheme.primary or currentTheme.text; tl.TextSize = 12; tl.Font = Enum.Font.Gotham; tl.TextXAlignment = Enum.TextXAlignment.Left; tl.ZIndex = 14; tl.Parent = rw
+                    table.insert(Window._reg, {obj = tl, prop = "TextColor3", key = MD.Value[itm] and "primary" or "text"})
+                    
+                    local ck = Instance.new("Frame"); ck.Size = UDim2.new(0, 14, 0, 14); ck.Position = UDim2.new(1, -22, 0.5, 0); ck.AnchorPoint = Vector2.new(0, 0.5); ck.BackgroundColor3 = MD.Value[itm] and currentTheme.primary or currentTheme.background; ck.ZIndex = 14; ck.Parent = rw
+                    local ckc = Instance.new("UICorner"); ckc.CornerRadius = UDim.new(0, 4); ckc.Parent = ck
+                    table.insert(Window._reg, {obj = ck, prop = "BackgroundColor3", key = MD.Value[itm] and "primary" or "background"})
+
+                    local btn = Instance.new("TextButton"); btn.Size = UDim2.new(1, 0, 1, 0); btn.BackgroundTransparency = 1; btn.Text = ""; btn.ZIndex = 15; btn.Parent = rw
+                    btn.MouseEnter:Connect(function() tw(rw, {BackgroundColor3 = currentTheme.primary}, 0.15); tw(tl, {TextColor3 = Color3.new(1,1,1)}, 0.15) end)
+                    btn.MouseLeave:Connect(function() tw(rw, {BackgroundColor3 = currentTheme.topbar}, 0.15); tw(tl, {TextColor3 = MD.Value[itm] and currentTheme.primary or currentTheme.text}, 0.15) end)
+                    btn.MouseButton1Click:Connect(function()
+                        if MD.Value[itm] then MD.Value[itm] = nil else MD.Value[itm] = true end
+                        ct.Text = count() .. " selected"; bld(); if c.Callback then c.Callback(MD.Value) end
+                    end)
+                end
+            end
+            bld()
+
+            local bt = Instance.new("TextButton"); bt.Size = UDim2.new(1, -26, 0, 36); bt.BackgroundTransparency = 1; bt.Text = ""; bt.ZIndex = 5; bt.Parent = f
+            bt.MouseButton1Click:Connect(function()
+                opn = not opn
+                if opn then
+                    scr.Visible = true; local h = math.min(140, ssl.AbsoluteContentSize.Y + 8)
+                    tw(f, {Size = UDim2.new(1, 0, 0, 42 + h)}, 0.25); tw(scr, {Size = UDim2.new(1, 0, 0, h)}, 0.25); tw(arr, {Rotation = 180}, 0.25)
+                    tw(t, {TextTransparency = 1}, 0.15); tw(ct, {TextTransparency = 1}, 0.15)
+                else
+                    tw(f, {Size = UDim2.new(1, 0, 0, 36)}, 0.25); tw(scr, {Size = UDim2.new(1, 0, 0, 0)}, 0.25); tw(arr, {Rotation = 0}, 0.25); tw(t, {TextTransparency = 0}, 0.15); tw(ct, {TextTransparency = 0}, 0.15); task.wait(0.26); scr.Visible = false
+                end
+            end)
+
+            function MD:SetValue(tVals) MD.Value = tVals; ct.Text = count() .. " selected"; bld() end
+            AuraUI.Options[n] = MD; return MD
+        end
+            local D = {Value = c.Default, Values = c.Values or {}, Name = n, Type = "Dropdown"}
+            local opn = false; local f = baseObj(36); f.ClipsDescendants = false
+            local t = addLbl(f, c.Title or n, 12, Enum.Font.GothamMedium, currentTheme.text, nil, 14, 0); t.Size = UDim2.new(1, -40, 1, 0)
+            table.insert(Window._reg, {obj = t, prop = "TextColor3", key = "text"})
+            local arr = addLbl(f, "▼", 10, Enum.Font.Gotham, currentTheme.primary, Enum.TextXAlignment.Right, 0, 0); arr.Size = UDim2.new(0, 22, 1, 0); arr.Position = UDim2.new(1, -28, 0, 0)
             table.insert(Window._reg, {obj = arr, prop = "TextColor3", key = "primary"})
             
-            local scr = Instance.new("ScrollingFrame"); scr.Size = UDim2.new(1, 0, 0, 0); scr.Position = UDim2.new(0, 0, 0, 42); scr.BackgroundColor3 = currentTheme.topbar; scr.BorderSizePixel = 0; scr.ScrollBarThickness = 3; scr.Visible = false; scr.ZIndex = 12; scr.Parent = f
-            table.insert(Window._reg, {obj = scr, prop = "BackgroundColor3", key = "topbar"})
-            local scrc = Instance.new("UICorner"); scrc.CornerRadius = UDim.new(0, 8); scrc.Parent = scr
+            local scr = Instance.new("ScrollingFrame"); scr.Size = UDim2.new(1, 0, 0, 0); scr.Position = UDim2.new(0, 0, 0, 40); scr.BackgroundColor3 = currentTheme.background; scr.BorderSizePixel = 0; scr.ScrollBarThickness = 2; scr.Visible = false; scr.ZIndex = 12; scr.Parent = f
+            table.insert(Window._reg, {obj = scr, prop = "BackgroundColor3", key = "background"})
+            local scrc = Instance.new("UICorner"); scrc.CornerRadius = UDim.new(0, 6); scrc.Parent = scr
+            local scrs = Instance.new("UIStroke"); scrs.Color = currentTheme.primary; scrs.Thickness = 1; scrs.Transparency = 0.5; scrs.Parent = scr
+            table.insert(Window._reg, {obj = scrs, prop = "Color", key = "primary"})
+
             local ssl = Instance.new("UIListLayout"); ssl.SortOrder = Enum.SortOrder.LayoutOrder; ssl.Padding = UDim.new(0, 2); ssl.Parent = scr
             ssl:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() scr.CanvasSize = UDim2.new(0, 0, 0, ssl.AbsoluteContentSize.Y + 8) end)
 
             local function redraw()
                 for _, ch in ipairs(scr:GetChildren()) do if ch:IsA("TextButton") then ch:Destroy() end end
                 for _, val in ipairs(D.Values) do
-                    local ob = Instance.new("TextButton"); ob.Size = UDim2.new(1, -8, 0, 26); ob.Position = UDim2.new(0, 4, 0, 0); ob.BackgroundColor3 = currentTheme.element; ob.Text = "  " .. val; ob.TextColor3 = currentTheme.text; ob.TextSize = 13; ob.Font = Enum.Font.Gotham; ob.TextXAlignment = Enum.TextXAlignment.Left; ob.ZIndex = 13; ob.Parent = scr
-                    table.insert(Window._reg, {obj = ob, prop = "BackgroundColor3", key = "element"}); table.insert(Window._reg, {obj = ob, prop = "TextColor3", key = "text"})
-                    local oc = Instance.new("UICorner"); oc.CornerRadius = UDim.new(0, 6); oc.Parent = ob
+                    local ob = Instance.new("TextButton"); ob.Size = UDim2.new(1, -8, 0, 26); ob.Position = UDim2.new(0, 4, 0, 0); ob.BackgroundColor3 = currentTheme.topbar; ob.Text = "  " .. val; ob.TextColor3 = currentTheme.text; ob.TextSize = 12; ob.Font = Enum.Font.Gotham; ob.TextXAlignment = Enum.TextXAlignment.Left; ob.ZIndex = 13; ob.Parent = scr
+                    table.insert(Window._reg, {obj = ob, prop = "BackgroundColor3", key = "topbar"}); table.insert(Window._reg, {obj = ob, prop = "TextColor3", key = "text"})
+                    local oc = Instance.new("UICorner"); oc.CornerRadius = UDim.new(0, 4); oc.Parent = ob
                     ob.MouseButton1Click:Connect(function()
-                        D.Value = val; t.Text = (c.Title and (c.Title .. "  (" .. val .. ")") or val)
-                        opn = false; tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.25); tw(arr, {Rotation = 0}, 0.25); task.wait(0.26); scr.Visible = false
+                        D.Value = val; t.Text = c.Title and (c.Title .. "  (" .. val .. ")") or val
+                        opn = false; tw(arr, {Rotation = 0}, 0.25); tw(t, {TextTransparency = 0}, 0.15)
+                        tw(f, {Size = UDim2.new(1, 0, 0, 36)}, 0.25); tw(scr, {Size = UDim2.new(1, 0, 0, 0)}, 0.25); task.wait(0.26); scr.Visible = false
                         if c.Callback then c.Callback(val) end
                     end)
-                    ob.MouseEnter:Connect(function() tw(ob, {BackgroundColor3 = currentTheme.primary}, 0.15) end); ob.MouseLeave:Connect(function() tw(ob, {BackgroundColor3 = currentTheme.element}, 0.15) end)
+                    ob.MouseEnter:Connect(function() tw(ob, {BackgroundColor3 = currentTheme.primary}, 0.15) end); ob.MouseLeave:Connect(function() tw(ob, {BackgroundColor3 = currentTheme.topbar}, 0.15) end)
                 end
             end
             redraw(); if D.Value then t.Text = c.Title and (c.Title .. "  (" .. D.Value .. ")") or D.Value end
             
-            local bt = Instance.new("TextButton"); bt.Size = UDim2.new(1, -26, 0, 38); bt.BackgroundTransparency = 1; bt.Text = ""; bt.ZIndex = 5; bt.Parent = f
+            local bt = Instance.new("TextButton"); bt.Size = UDim2.new(1, -26, 0, 36); bt.BackgroundTransparency = 1; bt.Text = ""; bt.ZIndex = 5; bt.Parent = f
             bt.MouseButton1Click:Connect(function()
                 opn = not opn
                 if opn then
                     scr.Visible = true; local h = math.min(140, ssl.AbsoluteContentSize.Y + 8)
                     tw(f, {Size = UDim2.new(1, 0, 0, 42 + h)}, 0.25); tw(scr, {Size = UDim2.new(1, 0, 0, h)}, 0.25); tw(arr, {Rotation = 180}, 0.25)
+                    tw(t, {TextTransparency = 1}, 0.15) -- Hide name while open per user request
                 else
-                    tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.25); tw(scr, {Size = UDim2.new(1, 0, 0, 0)}, 0.25); tw(arr, {Rotation = 0}, 0.25); task.wait(0.26); scr.Visible = false
+                    tw(f, {Size = UDim2.new(1, 0, 0, 36)}, 0.25); tw(scr, {Size = UDim2.new(1, 0, 0, 0)}, 0.25); tw(arr, {Rotation = 0}, 0.25); tw(t, {TextTransparency = 0}, 0.15); task.wait(0.26); scr.Visible = false
                 end
             end)
 
@@ -467,22 +533,25 @@ function AuraUI:CreateWindow(cfg)
         function Tab:AddColorpicker(n, c)
             local CP = {Value = c.Default or Color3.fromRGB(255, 255, 255), Name = n, Type = "Colorpicker"}
             local h, s, v = color3ToHsv(CP.Value); local opn = false
-            local f = baseObj(38); f.ClipsDescendants = false
-            local t = addLbl(f, c.Title or n, 13, Enum.Font.GothamSemibold, currentTheme.text, nil, 12, 0); t.Size = UDim2.new(1, -60, 1, 0)
+            local f = baseObj(36); f.ClipsDescendants = false
+            local t = addLbl(f, c.Title or n, 12, Enum.Font.GothamMedium, currentTheme.text, nil, 14, 0); t.Size = UDim2.new(1, -60, 1, 0)
             table.insert(Window._reg, {obj = t, prop = "TextColor3", key = "text"})
             
-            local sw = Instance.new("TextButton"); sw.Size = UDim2.new(0, 32, 0, 20); sw.Position = UDim2.new(1, -42, 0.5, 0); sw.AnchorPoint = Vector2.new(0, 0.5); sw.BackgroundColor3 = CP.Value; sw.Text = ""; sw.ZIndex = 6; sw.Parent = f
+            local sw = Instance.new("TextButton"); sw.Size = UDim2.new(0, 30, 0, 18); sw.Position = UDim2.new(1, -40, 0.5, 0); sw.AnchorPoint = Vector2.new(0, 0.5); sw.BackgroundColor3 = CP.Value; sw.Text = ""; sw.ZIndex = 6; sw.Parent = f
             local swc = Instance.new("UICorner"); swc.CornerRadius = UDim.new(0, 4); swc.Parent = sw
+            local sws = Instance.new("UIStroke"); sws.Color = Color3.new(1,1,1); sws.Thickness = 1; sws.Transparency = 0.5; sws.Parent = sw
             
-            local pan = Instance.new("Frame"); pan.Size = UDim2.new(1, 0, 0, 0); pan.Position = UDim2.new(0, 0, 0, 42); pan.BackgroundColor3 = currentTheme.topbar; pan.Visible = false; pan.ZIndex = 10; pan.ClipsDescendants = true; pan.Parent = f
-            table.insert(Window._reg, {obj = pan, prop = "BackgroundColor3", key = "topbar"}); local pc = Instance.new("UICorner"); pc.CornerRadius = UDim.new(0, 8); pc.Parent = pan
+            local pan = Instance.new("Frame"); pan.Size = UDim2.new(1, 0, 0, 0); pan.Position = UDim2.new(0, 0, 0, 40); pan.BackgroundColor3 = currentTheme.background; pan.Visible = false; pan.ZIndex = 14; pan.ClipsDescendants = true; pan.Parent = f
+            table.insert(Window._reg, {obj = pan, prop = "BackgroundColor3", key = "background"}); local pc = Instance.new("UICorner"); pc.CornerRadius = UDim.new(0, 6); pc.Parent = pan
+            local ps = Instance.new("UIStroke"); ps.Color = currentTheme.primary; ps.Thickness = 1; ps.Transparency = 0.5; ps.Parent = pan
+            table.insert(Window._reg, {obj = ps, prop = "Color", key = "primary"})
 
-            local svy = Instance.new("ImageLabel"); svy.Size = UDim2.new(1, -16, 0, 110); svy.Position = UDim2.new(0, 8, 0, 8); svy.Image = "rbxassetid://4155801252"; svy.BackgroundColor3 = hsvToColor3(h, 1, 1); svy.ZIndex = 11; svy.Parent = pan
-            local svc = Instance.new("UICorner"); svc.CornerRadius = UDim.new(0, 6); svc.Parent = svy
-            local svknb = Instance.new("Frame"); svknb.Size = UDim2.new(0, 10, 0, 10); svknb.AnchorPoint = Vector2.new(0.5, 0.5); svknb.BackgroundColor3 = Color3.new(1, 1, 1); svknb.ZIndex = 12; svknb.Parent = svy; local skc = Instance.new("UICorner"); skc.CornerRadius = UDim.new(1, 0); skc.Parent = svknb
+            local svy = Instance.new("ImageLabel"); svy.Size = UDim2.new(1, -16, 0, 110); svy.Position = UDim2.new(0, 8, 0, 8); svy.Image = "rbxassetid://4155801252"; svy.BackgroundColor3 = hsvToColor3(h, 1, 1); svy.ZIndex = 15; svy.Parent = pan
+            local svc = Instance.new("UICorner"); svc.CornerRadius = UDim.new(0, 4); svc.Parent = svy
+            local svknb = Instance.new("Frame"); svknb.Size = UDim2.new(0, 10, 0, 10); svknb.AnchorPoint = Vector2.new(0.5, 0.5); svknb.BackgroundColor3 = Color3.new(1, 1, 1); svknb.ZIndex = 16; svknb.Parent = svy; local skc = Instance.new("UICorner"); skc.CornerRadius = UDim.new(1, 0); skc.Parent = svknb
             
-            local hue = Instance.new("ImageLabel"); hue.Size = UDim2.new(1, -16, 0, 12); hue.Position = UDim2.new(0, 8, 0, 124); hue.Image = "rbxassetid://698052001"; hue.BackgroundColor3 = Color3.new(1,1,1); hue.ZIndex = 11; hue.Parent = pan; local hc = Instance.new("UICorner"); hc.CornerRadius = UDim.new(1, 0); hc.Parent = hue
-            local hknb = Instance.new("Frame"); hknb.Size = UDim2.new(0, 8, 1, 4); hknb.AnchorPoint = Vector2.new(0.5, 0.5); hknb.BackgroundColor3 = Color3.new(1, 1, 1); hknb.ZIndex = 12; hknb.Parent = hue; local hkc = Instance.new("UICorner"); hkc.CornerRadius = UDim.new(0, 4); hkc.Parent = hknb
+            local hue = Instance.new("ImageLabel"); hue.Size = UDim2.new(1, -16, 0, 12); hue.Position = UDim2.new(0, 8, 0, 124); hue.Image = "rbxassetid://698052001"; hue.BackgroundColor3 = Color3.new(1,1,1); hue.ZIndex = 15; hue.Parent = pan; local hc = Instance.new("UICorner"); hc.CornerRadius = UDim.new(1, 0); hc.Parent = hue
+            local hknb = Instance.new("Frame"); hknb.Size = UDim2.new(0, 6, 1, 4); hknb.AnchorPoint = Vector2.new(0.5, 0.5); hknb.BackgroundColor3 = Color3.new(1, 1, 1); hknb.ZIndex = 16; hknb.Parent = hue; local hkc = Instance.new("UICorner"); hkc.CornerRadius = UDim.new(0, 4); hkc.Parent = hknb
 
             local function upd()
                 CP.Value = hsvToColor3(h, s, v); sw.BackgroundColor3 = CP.Value; svy.BackgroundColor3 = hsvToColor3(h, 1, 1)
@@ -491,10 +560,22 @@ function AuraUI:CreateWindow(cfg)
             end
 
             local svDrag, hueDrag = false, false
-            local svBtn = Instance.new("TextButton"); svBtn.Size = UDim2.new(1, 0, 1, 0); svBtn.BackgroundTransparency = 1; svBtn.Text = ""; svBtn.ZIndex = 13; svBtn.Parent = svy
+            local svBtn = Instance.new("TextButton"); svBtn.Size = UDim2.new(1, 0, 1, 0); svBtn.BackgroundTransparency = 1; svBtn.Text = ""; svBtn.ZIndex = 17; svBtn.Parent = svy
             svBtn.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then svDrag = true end end)
-            local hBtn = Instance.new("TextButton"); hBtn.Size = UDim2.new(1, 0, 1, 0); hBtn.BackgroundTransparency = 1; hBtn.Text = ""; hBtn.ZIndex = 13; hBtn.Parent = hue
+            local hBtn = Instance.new("TextButton"); hBtn.Size = UDim2.new(1, 0, 1, 0); hBtn.BackgroundTransparency = 1; hBtn.Text = ""; hBtn.ZIndex = 17; hBtn.Parent = hue
             hBtn.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then hueDrag = true end end)
+
+            local function releaseDrag()
+                if svDrag or hueDrag then
+                    svDrag = false; hueDrag = false
+                    -- Auto-close when released per user request
+                    if opn then
+                        opn = false
+                        tw(t, {TextTransparency = 0}, 0.15)
+                        tw(pan, {Size = UDim2.new(1, 0, 0, 0)}, 0.2); tw(f, {Size = UDim2.new(1, 0, 0, 36)}, 0.2); task.wait(0.22); pan.Visible = false
+                    end
+                end
+            end
 
             UserInputService.InputChanged:Connect(function(inp)
                 if inp.UserInputType == Enum.UserInputType.MouseMovement then
@@ -502,21 +583,23 @@ function AuraUI:CreateWindow(cfg)
                     elseif hueDrag then h = math.clamp((inp.Position.X - hue.AbsolutePosition.X) / hue.AbsoluteSize.X, 0, 1); upd() end
                 end
             end)
-            UserInputService.InputEnded:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then svDrag, hueDrag = false, false end end)
+            UserInputService.InputEnded:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then releaseDrag() end end)
             upd()
 
             sw.MouseButton1Click:Connect(function()
                 opn = not opn
-                if opn then pan.Visible = true; tw(pan, {Size = UDim2.new(1, 0, 0, 144)}, 0.25); tw(f, {Size = UDim2.new(1, 0, 0, 192)}, 0.25)
-                else tw(pan, {Size = UDim2.new(1, 0, 0, 0)}, 0.2); tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.2); task.wait(0.22); pan.Visible = false end
+                if opn then pan.Visible = true; tw(t, {TextTransparency = 1}, 0.15); tw(pan, {Size = UDim2.new(1, 0, 0, 144)}, 0.25); tw(f, {Size = UDim2.new(1, 0, 0, 188)}, 0.25)
+                else tw(t, {TextTransparency = 0}, 0.15); tw(pan, {Size = UDim2.new(1, 0, 0, 0)}, 0.2); tw(f, {Size = UDim2.new(1, 0, 0, 36)}, 0.2); task.wait(0.22); pan.Visible = false end
             end)
             
-            -- Adding an explicit Confirm button for colorpickers
-            local cBtn = Instance.new("TextButton"); cBtn.Size = UDim2.new(1, -26, 0, 38); cBtn.BackgroundTransparency = 1; cBtn.Text = ""; cBtn.ZIndex = 5; cBtn.Parent = f
+            -- Adding an explicit Confirm button for colorpickers (clicking empty space)
+            local cBtn = Instance.new("TextButton"); cBtn.Size = UDim2.new(1, -40, 0, 36); cBtn.BackgroundTransparency = 1; cBtn.Text = ""; cBtn.ZIndex = 5; cBtn.Parent = f
             cBtn.MouseButton1Click:Connect(function()
-                opn = not opn
-                if opn then pan.Visible = true; tw(pan, {Size = UDim2.new(1, 0, 0, 144)}, 0.25); tw(f, {Size = UDim2.new(1, 0, 0, 192)}, 0.25)
-                else tw(pan, {Size = UDim2.new(1, 0, 0, 0)}, 0.2); tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.2); task.wait(0.22); pan.Visible = false end
+                if opn then
+                    opn = false
+                    tw(t, {TextTransparency = 0}, 0.15)
+                    tw(pan, {Size = UDim2.new(1, 0, 0, 0)}, 0.2); tw(f, {Size = UDim2.new(1, 0, 0, 36)}, 0.2); task.wait(0.22); pan.Visible = false
+                end
             end)
 
             function CP:SetValueRGB(col) CP.Value = col; sw.BackgroundColor3 = col; h, s, v = color3ToHsv(col); upd() end

@@ -463,6 +463,8 @@ function AuraUI:CreateWindow(cfg)
             function MD:SetValue(tVals) MD.Value = tVals; ct.Text = count() .. " selected"; bld() end
             AuraUI.Options[n] = MD; return MD
         end
+
+        function Tab:AddDropdown(n, c)
             local D = {Value = c.Default, Values = c.Values or {}, Name = n, Type = "Dropdown"}
             local opn = false; local f = baseObj(36); f.ClipsDescendants = false
             local t = addLbl(f, c.Title or n, 12, Enum.Font.GothamMedium, currentTheme.text, nil, 14, 0); t.Size = UDim2.new(1, -40, 1, 0)
@@ -737,4 +739,3 @@ function AuraUI:Notify(cfg)
 end
 
 return AuraUI
-

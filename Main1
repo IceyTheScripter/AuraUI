@@ -1225,31 +1225,48 @@ function AuraUI:CreateWindow(config)
                 btn.Parent = f
 
                 local pickerArea = Instance.new("Frame")
-                pickerArea.Size = UDim2.new(1, -24, 0, 80)
+                pickerArea.Size = UDim2.new(1, -24, 0, 130)
                 pickerArea.Position = UDim2.new(0, 12, 0, 46)
                 pickerArea.BackgroundTransparency = 1
                 pickerArea.Parent = f
 
-                -- R, G, B standard sliders for perfect reliability
+                -- Color state: r/g/b (0-255), brightness (0-1), transparency (0-1)
                 local r, g, b = math.floor(CP.Value.R*255), math.floor(CP.Value.G*255), math.floor(CP.Value.B*255)
+                local h, s, v = Color3.fromRGB(r, g, b):ToHSV()
+                local trans = 0
                 
-                local function makeColorSlider(yPos, colorType)
+                local function makeColorSlider(yPos, labelText)
+                    local container = Instance.new("Frame")
+                    container.Size = UDim2.new(1, 0, 0, 18)
+                    container.Position = UDim2.new(0, 0, 0, yPos)
+                    container.BackgroundTransparency = 1
+                    container.Parent = pickerArea
+
+                    local lbl = Instance.new("TextLabel")
+                    lbl.Size = UDim2.new(0, 24, 1, 0)
+                    lbl.BackgroundTransparency = 1
+                    lbl.Text = labelText
+                    lbl.TextColor3 = AuraUI.Theme.TextMuted
+                    lbl.Font = Enum.Font.GothamBold
+                    lbl.TextSize = 11
+                    lbl.Parent = container
+
                     local track = Instance.new("Frame")
-                    track.Size = UDim2.new(1, 0, 0, 12)
-                    track.Position = UDim2.new(0, 0, 0, yPos)
+                    track.Size = UDim2.new(1, -30, 0, 8)
+                    track.Position = UDim2.new(0, 28, 0.5, -4)
                     track.BackgroundColor3 = AuraUI.Theme.Card
-                    track.Parent = pickerArea
+                    track.Parent = container
                     local tc = Instance.new("UICorner") tc.CornerRadius = UDim.new(1, 0) tc.Parent = track
                     
                     local grad = Instance.new("UIGradient")
                     grad.Parent = track
                     
                     local thumb = Instance.new("Frame")
-                    thumb.Size = UDim2.new(0, 12, 0, 16)
-                    thumb.Position = UDim2.new(0, -6, 0.5, -8)
+                    thumb.Size = UDim2.new(0, 10, 0, 14)
+                    thumb.Position = UDim2.new(0, -5, 0.5, -7)
                     thumb.BackgroundColor3 = Color3.new(1,1,1)
                     thumb.Parent = track
-                    local thc = Instance.new("UICorner") thc.CornerRadius = UDim.new(0, 4) thc.Parent = thumb
+                    local thc = Instance.new("UICorner") thc.CornerRadius = UDim.new(0, 3) thc.Parent = thumb
                     
                     local trig = Instance.new("TextButton")
                     trig.Size = UDim2.new(1, 0, 1, 0)
@@ -1260,44 +1277,78 @@ function AuraUI:CreateWindow(config)
                     return track, grad, thumb, trig
                 end
 
-                local rTrack, rGrad, rThumb, rTrig = makeColorSlider(10, "R")
-                local gTrack, gGrad, gThumb, gTrig = makeColorSlider(35, "G")
-                local bTrack, bGrad, bThumb, bTrig = makeColorSlider(60, "B")
+                local rTrack, rGrad, rThumb, rTrig = makeColorSlider(4, "R")
+                local gTrack, gGrad, gThumb, gTrig = makeColorSlider(28, "G")
+                local bTrack, bGrad, bThumb, bTrig = makeColorSlider(52, "B")
+                local brTrack, brGrad, brThumb, brTrig = makeColorSlider(76, "Brt")
+                local trTrack, trGrad, trThumb, trTrig = makeColorSlider(100, "Trn")
+
+                local function getFinalColor()
+                    local base = Color3.fromRGB(r, g, b)
+                    local h, s, _ = base:ToHSV()
+                    return Color3.fromHSV(h, s, v)
+                end
 
                 local function updateGradients()
                     rGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(0, g, b)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, g, b))})
                     gGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(r, 0, b)), ColorSequenceKeypoint.new(1, Color3.fromRGB(r, 255, b))})
                     bGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(r, g, 0)), ColorSequenceKeypoint.new(1, Color3.fromRGB(r, g, 255))})
+                    
+                    local base = Color3.fromRGB(r, g, b)
+                    local bh, bs, _ = base:ToHSV()
+                    brGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHSV(bh, bs, 0)), ColorSequenceKeypoint.new(1, Color3.fromHSV(bh, bs, 1))})
+                    
+                    local final = getFinalColor()
+                    trGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, final), ColorSequenceKeypoint.new(1, AuraUI.Theme.Card)})
                 end
 
                 local function setCPVal(newColor)
-                    CP.Value = newColor
-                    colorDisp.BackgroundColor3 = newColor
+                    v = select(3, newColor:ToHSV())
                     r, g, b = math.floor(newColor.R*255), math.floor(newColor.G*255), math.floor(newColor.B*255)
-                    rThumb.Position = UDim2.new(newColor.R, -6, 0.5, -8)
-                    gThumb.Position = UDim2.new(newColor.G, -6, 0.5, -8)
-                    bThumb.Position = UDim2.new(newColor.B, -6, 0.5, -8)
+                    
+                    local final = getFinalColor()
+                    CP.Value = final
+                    colorDisp.BackgroundColor3 = final
+                    colorDisp.BackgroundTransparency = trans
+                    
+                    rThumb.Position = UDim2.new(newColor.R, -5, 0.5, -7)
+                    gThumb.Position = UDim2.new(newColor.G, -5, 0.5, -7)
+                    bThumb.Position = UDim2.new(newColor.B, -5, 0.5, -7)
+                    brThumb.Position = UDim2.new(v, -5, 0.5, -7)
+                    trThumb.Position = UDim2.new(trans, -5, 0.5, -7)
+                    
                     updateGradients()
-                    if opts.Callback then opts.Callback(newColor) end
+                    if opts.Callback then opts.Callback(final, trans) end
                 end
 
                 local function handleDrag(track, thumb, typeVar, input)
                     local perc = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
                     if typeVar == "R" then r = math.floor(perc * 255) 
                     elseif typeVar == "G" then g = math.floor(perc * 255)
-                    else b = math.floor(perc * 255) end
-                    setCPVal(Color3.fromRGB(r, g, b))
+                    elseif typeVar == "B" then b = math.floor(perc * 255)
+                    elseif typeVar == "Brt" then v = perc
+                    elseif typeVar == "Trn" then trans = perc end
+                    
+                    local final = getFinalColor()
+                    CP.Value = final
+                    colorDisp.BackgroundColor3 = final
+                    colorDisp.BackgroundTransparency = trans
+                    thumb.Position = UDim2.new(perc, -5, 0.5, -7)
+                    updateGradients()
+                    if opts.Callback then opts.Callback(final, trans) end
                 end
 
-                local draggingR, draggingG, draggingB = false, false, false
+                local draggingR, draggingG, draggingB, draggingBrt, draggingTrn = false, false, false, false, false
 
-                rTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingR = true; PlaySound(AuraUI.Sounds.Slide, 0.1, 1); handleDrag(rTrack, rThumb, "R", inp) end end)
-                gTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingG = true; PlaySound(AuraUI.Sounds.Slide, 0.1, 1); handleDrag(gTrack, gThumb, "G", inp) end end)
-                bTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingB = true; PlaySound(AuraUI.Sounds.Slide, 0.1, 1); handleDrag(bTrack, bThumb, "B", inp) end end)
+                rTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingR = true; PlaySound(AuraUI.Sounds.Slide, 0.05, 1); handleDrag(rTrack, rThumb, "R", inp) end end)
+                gTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingG = true; PlaySound(AuraUI.Sounds.Slide, 0.05, 1); handleDrag(gTrack, gThumb, "G", inp) end end)
+                bTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingB = true; PlaySound(AuraUI.Sounds.Slide, 0.05, 1); handleDrag(bTrack, bThumb, "B", inp) end end)
+                brTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingBrt = true; PlaySound(AuraUI.Sounds.Slide, 0.05, 1); handleDrag(brTrack, brThumb, "Brt", inp) end end)
+                trTrig.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then draggingTrn = true; PlaySound(AuraUI.Sounds.Slide, 0.05, 1); handleDrag(trTrack, trThumb, "Trn", inp) end end)
                 
                 UserInputService.InputEnded:Connect(function(inp)
                     if inp.UserInputType == Enum.UserInputType.MouseButton1 then
-                        draggingR, draggingG, draggingB = false, false, false
+                        draggingR, draggingG, draggingB, draggingBrt, draggingTrn = false, false, false, false, false
                     end
                 end)
                 UserInputService.InputChanged:Connect(function(inp)
@@ -1305,6 +1356,8 @@ function AuraUI:CreateWindow(config)
                         if draggingR then handleDrag(rTrack, rThumb, "R", inp) end
                         if draggingG then handleDrag(gTrack, gThumb, "G", inp) end
                         if draggingB then handleDrag(bTrack, bThumb, "B", inp) end
+                        if draggingBrt then handleDrag(brTrack, brThumb, "Brt", inp) end
+                        if draggingTrn then handleDrag(trTrack, trThumb, "Trn", inp) end
                     end
                 end)
 
@@ -1312,7 +1365,7 @@ function AuraUI:CreateWindow(config)
                     open = not open
                     PlaySound(AuraUI.Sounds.MenuOpen, 0.3, open and 1.1 or -1)
                     if open then
-                        CreateTween(f, {Size = UDim2.new(1, 0, 0, 136)}, 0.3, Enum.EasingStyle.Quart)
+                        CreateTween(f, {Size = UDim2.new(1, 0, 0, 185)}, 0.3, Enum.EasingStyle.Quart)
                         CreateTween(title, {TextColor3 = AuraUI.Theme.Text}, 0.2)
                         CreateTween(fs, {Color = AuraUI.Theme.Primary}, 0.2)
                     else

@@ -64,11 +64,11 @@ AuraUI.Options = {}
 AuraUI.Toggled = true
 AuraUI.ThemeObjects = {}
 AuraUI.Sounds = {
-    Hover = "rbxassetid://6895079853",     -- Soft tick
-    Click = "rbxassetid://6895058988",     -- Sharp click
-    MenuOpen = "rbxassetid://6895058988",  -- Heavy click
-    Toggle = "rbxassetid://6895058988",    -- Sharp click (pitched)
-    Slide = "rbxassetid://6895079853"      -- Soft tick
+    Hover = "rbxassetid://121115191372938",     -- Soft tick
+    Click = "rbxassetid://140387697208266",     -- Sharp click
+    MenuOpen = "rbxassetid://9120728815",  -- Heavy click
+    Toggle = "rbxassetid://130452431655432",    -- Sharp click (pitched)
+    Slide = "rbxassetid://137695275338351"      -- Soft tick
 }
 
 -- Utility Functions

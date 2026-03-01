@@ -6,6 +6,7 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+local Debris = game:GetService("Debris")
 
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
@@ -62,27 +63,27 @@ AuraUI.Theme = AuraUI.Themes[AuraUI.CurrentThemeName]
 AuraUI.Options = {}
 AuraUI.Toggled = true
 AuraUI.ThemeObjects = {}
-
 AuraUI.Sounds = {
-    Hover = "rbxassetid://18926058970",
-    Click = "rbxassetid://140387697208266",
-    MenuOpen = "rbxassetid://139821129588664",
-    Toggle = "rbxassetid://99801946430731",
-    Slide = "rbxassetid://86183360052690"
+    Hover = "rbxassetid://6895079853",     -- Soft tick
+    Click = "rbxassetid://6895058988",     -- Sharp click
+    MenuOpen = "rbxassetid://6895058988",  -- Heavy click
+    Toggle = "rbxassetid://6895058988",    -- Sharp click (pitched)
+    Slide = "rbxassetid://6895079853"      -- Soft tick
 }
 
 -- Utility Functions
 local function PlaySound(id, vol, pitch)
-    task.spawn(function()
-        local sound = Instance.new("Sound")
-        sound.SoundId = id
-        sound.Volume = vol or 0.3
-        sound.PlaybackSpeed = pitch or 1
-        sound.Parent = CoreGui
-        sound:Play()
-        sound.Ended:Wait()
-        sound:Destroy()
-    end)
+    -- Don't play if ID is empty
+    if not id or id == "" then return end
+    
+    local sound = Instance.new("Sound")
+    sound.SoundId = id
+    sound.Volume = vol or 0.3
+    sound.PlaybackSpeed = pitch or 1
+    sound.Parent = CoreGui
+    sound:Play()
+    -- Use Debris instead of Ended:Wait() because invalid IDs will yield infinitely
+    Debris:AddItem(sound, 3)
 end
 
 local function CreateTween(instance, properties, duration, style, direction)

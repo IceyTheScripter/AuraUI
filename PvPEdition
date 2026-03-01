@@ -236,19 +236,10 @@ function AuraUI:CreateWindow(config)
     -- local TopbarLine = Instance.new("Frame") 
     -- ...
  
-    -- Primary accent line on far left of topbar 
-    local TopAccent = Instance.new("Frame") 
-    TopAccent.Size = UDim2.new(0, 3, 1, 0) 
-    TopAccent.BackgroundColor3 = T.Primary 
-    TopAccent.BorderSizePixel = 0 
-    TopAccent.ZIndex = 5 
-    TopAccent.Parent = Topbar 
-    Reg(TopAccent, "BackgroundColor3", "Primary") 
- 
     -- Title 
     local TitleLbl = Instance.new("TextLabel") 
     TitleLbl.Size = UDim2.new(0, 250, 1, 0) 
-    TitleLbl.Position = UDim2.new(0, 10, 0, 0) 
+    TitleLbl.Position = UDim2.new(0, 15, 0, 0) 
     TitleLbl.BackgroundTransparency = 1 
     TitleLbl.Text = config.Title or "Aura" 
     TitleLbl.Font = Enum.Font.GothamBold 
@@ -257,6 +248,17 @@ function AuraUI:CreateWindow(config)
     TitleLbl.ZIndex = 5 
     TitleLbl.Parent = Topbar 
     Reg(TitleLbl, "TextColor3", "Text") 
+ 
+    -- Subtle accent dot instead of sticking out line
+    local TitleDot = Instance.new("Frame")
+    TitleDot.Size = UDim2.new(0, 4, 0, 4)
+    TitleDot.Position = UDim2.new(0, 6, 0.5, -2)
+    TitleDot.BackgroundColor3 = T.Primary
+    TitleDot.BorderSizePixel = 0
+    TitleDot.ZIndex = 5
+    TitleDot.Parent = Topbar
+    Reg(TitleDot, "BackgroundColor3", "Primary")
+    Corner(TitleDot, 2)
  
     if config.SubTitle and config.SubTitle ~= "" then 
         local SubLbl = Instance.new("TextLabel") 
@@ -362,6 +364,13 @@ function AuraUI:CreateWindow(config)
     ContentArea.BackgroundTransparency = 1 
     ContentArea.ClipsDescendants = true 
     ContentArea.Parent = Win 
+ 
+    local ContentPad = Instance.new("UIPadding")
+    ContentPad.PaddingTop = UDim.new(0, 5)
+    ContentPad.PaddingBottom = UDim.new(0, 5)
+    ContentPad.PaddingLeft = UDim.new(0, 5)
+    ContentPad.PaddingRight = UDim.new(0, 5)
+    ContentPad.Parent = ContentArea
  
     -- ── Keybind toggle ──────────────────────────────────────────────────────── 
     UserInputService.InputBegan:Connect(function(inp, gpe) 
@@ -941,18 +950,19 @@ function AuraUI:CreateWindow(config)
                         Opt.Size = UDim2.new(1, 0, 0, 24) 
                         Opt.BackgroundColor3 = AuraUI.Theme.Element 
                         Opt.BackgroundTransparency = (val == Drp.Value) and 0.4 or 1 
-                        Opt.Text = "  " .. val 
+                        Opt.Text = "  " .. tostring(val)
                         Opt.TextColor3 = (val == Drp.Value) and AuraUI.Theme.Primary or AuraUI.Theme.Text 
                         Opt.Font = Enum.Font.Gotham 
                         Opt.TextSize = 11 
                         Opt.TextXAlignment = Enum.TextXAlignment.Left 
                         Opt.AutoButtonColor = false 
                         Opt.ZIndex = 2001 
+                        Opt.Active = true -- Ensure button is active
                         Opt.Parent = List 
                         Corner(Opt, 4) 
                         Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency = 0.2, BackgroundColor3 = AuraUI.Theme.Primary, TextColor3 = Color3.new(1,1,1)}, 0.1) end) 
                         Opt.MouseLeave:Connect(function() Tween(Opt, {BackgroundTransparency = (val==Drp.Value) and 0.4 or 1, BackgroundColor3 = AuraUI.Theme.Element, TextColor3 = (val == Drp.Value) and AuraUI.Theme.Primary or AuraUI.Theme.Text}, 0.1) end) 
-                        Opt.MouseButton1Click:Connect(function() 
+                        Opt.MouseButton1Down:Connect(function() -- Use MouseButton1Down for better responsiveness
                             PlaySound(AuraUI.Sounds.Click, 0.22, 1.15) 
                             SetValue(val) 
                             CloseList() 

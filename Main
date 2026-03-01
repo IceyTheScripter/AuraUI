@@ -91,8 +91,18 @@ local function PlaySound(id, vol, pitch)
         end
 
         sound.Parent = CoreGui
+        
+        -- Looped check for loading
+        local start = tick()
+        while not sound.IsLoaded and tick() - start < 0.5 do
+            task.wait()
+        end
+        
         sound:Play()
-        Debris:AddItem(sound, 5)
+        sound.Ended:Connect(function() 
+            sound:Destroy() 
+        end)
+        Debris:AddItem(sound, 3)
     end)
 end
 
@@ -272,7 +282,7 @@ function AuraUI:CreateWindow(config)
 
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Size = UDim2.new(0, 14, 0, 14)
-    CloseBtn.Position = UDim2.new(1, -24, 0, 14)
+    CloseBtn.Position = UDim2.new(1, -20, 0, 10)
     CloseBtn.BackgroundTransparency = 1
     CloseBtn.Text = "X"
     CloseBtn.Font = Enum.Font.GothamBold
@@ -1312,7 +1322,9 @@ function AuraUI:CreateWindow(config)
                     end
                 end)
                 
-                setCPVal(CP.Value)
+                function CP:Set(val, ignoreCallback)
+                    setCPVal(val)
+                end
 
                 AuraUI.Options[id] = CP
                 return CP
@@ -1340,6 +1352,8 @@ function AuraUI:CreateWindow(config)
             UpdateTheme()
         end
     })
+
+    AuraUI:InitConfigUI(SettingsTab)
 
     return WindowData
 end
@@ -1390,6 +1404,103 @@ function AuraUI:Notify(opts)
     task.wait(opts.Duration or 3)
     CreateTween(note, {Position = UDim2.new(1, 10, 1, -80)}, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
     task.delay(0.4, function() note:Destroy() end)
+end
+
+function AuraUI:SaveConfig(name)
+    local data = {}
+    for id, opt in pairs(AuraUI.Options) do
+        local val = opt.Value
+        if typeof(val) == "Color3" then
+            data[id] = {type = "Color3", r = val.R, g = val.G, b = val.B}
+        elseif typeof(val) == "EnumItem" then
+            data[id] = {type = "EnumItem", name = val.Name}
+        else
+            data[id] = val
+        end
+    end
+    if writefile then
+        writefile("Aura_Configs/" .. name .. ".json", HttpService:JSONEncode(data))
+        AuraUI:Notify({Title = "Config Saved", Content = "Saved " .. name, Duration = 2})
+    end
+end
+
+function AuraUI:LoadConfig(name)
+    local path = "Aura_Configs/" .. name .. ".json"
+    if isfile and isfile(path) then
+        local data = HttpService:JSONDecode(readfile(path))
+        for id, val in pairs(data) do
+            local opt = AuraUI.Options[id]
+            if opt and opt.Set then
+                if type(val) == "table" and val.type == "Color3" then
+                    opt:Set(Color3.new(val.r, val.g, val.b), true)
+                elseif type(val) == "table" and val.type == "EnumItem" then
+                    opt:Set(Enum.KeyCode[val.name], true)
+                else
+                    opt:Set(val, true)
+                end
+            end
+        end
+        AuraUI:Notify({Title = "Config Loaded", Content = "Loaded " .. name, Duration = 2})
+    end
+end
+
+function AuraUI:GetConfigs()
+    if not isfolder or not makefolder then return {} end
+    if not isfolder("Aura_Configs") then makefolder("Aura_Configs") end
+    local files = listfiles("Aura_Configs")
+    local names = {}
+    for _, file in ipairs(files) do
+        local name = file:gsub("Aura_Configs/", ""):gsub(".json", "")
+        table.insert(names, name)
+    end
+    return names
+end
+
+-- Config UI Implementation logic moved into CreateWindow for access to SettingsTab
+-- Wait, I'll just put the helper function here and call it from CreateWindow
+function AuraUI:InitConfigUI(SettingsTab)
+    local ConfigSec = SettingsTab:AddSection("Configurations")
+    local configInput = ""
+
+    ConfigSec:AddTextInput("NewConfigName", {
+        Title = "Config Name",
+        Placeholder = "my_settings",
+        Callback = function(val) configInput = val end
+    })
+
+    ConfigSec:AddButton({
+        Title = "Save New Config",
+        Callback = function()
+            if configInput ~= "" then
+                AuraUI:SaveConfig(configInput)
+            else
+                AuraUI:Notify({Title = "Error", Content = "Enter a name first!", Duration = 2})
+            end
+        end
+    })
+
+    local configDrop
+    configDrop = ConfigSec:AddDropdown("LoadConfigDrop", {
+        Title = "Select Config",
+        Values = AuraUI:GetConfigs(),
+        Callback = function(val) end
+    })
+
+    ConfigSec:AddButton({
+        Title = "Load Selected",
+        Callback = function()
+            if configDrop.Value then
+                AuraUI:LoadConfig(configDrop.Value)
+            end
+        end
+    })
+
+    ConfigSec:AddButton({
+        Title = "Refresh List",
+        Callback = function()
+            configDrop.Values = AuraUI:GetConfigs()
+        end
+    })
 end
 
 return AuraUI

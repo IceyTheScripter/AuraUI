@@ -1,0 +1,369 @@
+local AuraUI = {}
+
+local coreGui = game:GetService("CoreGui")
+local uis = game:GetService("UserInputService")
+local tws = game:GetService("TweenService")
+local localPlayer = game:GetService("Players").LocalPlayer
+local mouse = localPlayer:GetMouse()
+
+AuraUI.Config = {
+    Themes = {
+        Vape = {
+            MainColor = Color3.fromRGB(0, 170, 100),
+            BackgroundColor = Color3.fromRGB(30, 30, 30),
+            ComponentColor = Color3.fromRGB(40, 40, 40),
+            HoverColor = Color3.fromRGB(50, 50, 50),
+            TextColor = Color3.fromRGB(240, 240, 240),
+            SubTextColor = Color3.fromRGB(150, 150, 150),
+            OutlineColor = Color3.fromRGB(20, 20, 20),
+            Font = Enum.Font.GothamMedium
+        },
+        Crimson = {
+            MainColor = Color3.fromRGB(220, 40, 40),
+            BackgroundColor = Color3.fromRGB(24, 24, 28),
+            ComponentColor = Color3.fromRGB(34, 34, 40),
+            HoverColor = Color3.fromRGB(44, 44, 52),
+            TextColor = Color3.fromRGB(230, 230, 240),
+            SubTextColor = Color3.fromRGB(130, 130, 140),
+            OutlineColor = Color3.fromRGB(15, 15, 18),
+            Font = Enum.Font.Jura
+        }
+    },
+    CurrentTheme = "Vape",
+    Options = {},
+    Toggled = true,
+    Instances = {}
+}
+
+local function getTheme() return AuraUI.Config.Themes[AuraUI.Config.CurrentTheme] end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "AuraVape"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+if syn and syn.protect_gui then syn.protect_gui(gui) end
+gui.Parent = (gethui and gethui()) or coreGui
+
+uis.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.RightControl then
+        AuraUI.Config.Toggled = not AuraUI.Config.Toggled
+        for _, window in pairs(AuraUI.Config.Instances) do
+            window.Visible = AuraUI.Config.Toggled
+        end
+    end
+end)
+
+local function makeDraggable(topbar, main)
+    local dragToggle, dragInput, dragStart, startPos
+    topbar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragToggle = true; dragStart = input.Position; startPos = main.Position
+        end
+    end)
+    uis.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement and dragToggle then
+            dragInput = input
+        end
+    end)
+    uis.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragToggle = false end
+    end)
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if dragToggle and dragInput then
+            local delta = dragInput.Position - dragStart
+            tws:Create(main, TweenInfo.new(0.08), {Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)}):Play()
+        end
+    end)
+end
+
+function AuraUI:CreateWindow(config)
+    local win = {Name = config.Title, XOffset = config.XOffset or 100, YOffset = config.YOffset or 50}
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 220, 0, 40)
+    mainFrame.Position = UDim2.new(0, win.XOffset, 0, win.YOffset)
+    mainFrame.BackgroundColor3 = getTheme().BackgroundColor
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = gui
+
+    local outline = Instance.new("UIStroke")
+    outline.Color = getTheme().OutlineColor
+    outline.Thickness = 1
+    outline.Parent = mainFrame
+
+    -- Standard Vape-style fat topbar
+    local topbar = Instance.new("Frame")
+    topbar.Size = UDim2.new(1, 0, 0, 40)
+    topbar.BackgroundColor3 = getTheme().BackgroundColor
+    topbar.BorderSizePixel = 0
+    topbar.Parent = mainFrame
+    
+    local topAccent = Instance.new("Frame")
+    topAccent.Size = UDim2.new(1, 0, 0, 2)
+    topAccent.BackgroundColor3 = getTheme().MainColor
+    topAccent.BorderSizePixel = 0
+    topAccent.Parent = topbar
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -20, 1, 0)
+    title.Position = UDim2.new(0, 10, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = config.Title
+    title.TextColor3 = getTheme().TextColor
+    title.Font = getTheme().Font
+    title.TextSize = 16
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = topbar
+
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, 0, 0, 0)
+    container.Position = UDim2.new(0, 0, 0, 40)
+    container.BackgroundColor3 = getTheme().BackgroundColor
+    container.BorderSizePixel = 0
+    container.ClipsDescendants = true
+    container.Parent = mainFrame
+    
+    local layout = Instance.new("UIListLayout")
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = container
+
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        container.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y)
+    end)
+
+    makeDraggable(topbar, mainFrame)
+    table.insert(AuraUI.Config.Instances, mainFrame)
+
+    function win:AddToggle(id, opts)
+        local toggled = opts.Default or false
+        local t = {Value = toggled}
+
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 36)
+        btn.BackgroundColor3 = getTheme().ComponentColor
+        btn.BorderSizePixel = 0
+        btn.Text = ""
+        btn.AutoButtonColor = false
+        btn.Parent = container
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(1, -20, 1, 0)
+        lbl.Position = UDim2.new(0, 10, 0, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = opts.Title
+        lbl.TextColor3 = toggled and getTheme().MainColor or getTheme().TextColor
+        lbl.Font = getTheme().Font
+        lbl.TextSize = 14
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = btn
+
+        local function trigger()
+            toggled = not toggled
+            t.Value = toggled
+            lbl.TextColor3 = toggled and getTheme().MainColor or getTheme().TextColor
+            if opts.Callback then opts.Callback(toggled) end
+        end
+
+        btn.MouseButton1Click:Connect(trigger)
+        btn.MouseEnter:Connect(function() tws:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().HoverColor}):Play() end)
+        btn.MouseLeave:Connect(function() tws:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().ComponentColor}):Play() end)
+
+        if toggled and opts.Callback then opts.Callback(toggled) end
+        AuraUI.Config.Options[id] = t
+        return t
+    end
+
+    function win:AddButton(opts)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 36)
+        btn.BackgroundColor3 = getTheme().ComponentColor
+        btn.BorderSizePixel = 0
+        btn.Text = "  " .. opts.Title
+        btn.TextColor3 = getTheme().TextColor
+        btn.Font = getTheme().Font
+        btn.TextSize = 14
+        btn.TextXAlignment = Enum.TextXAlignment.Left
+        btn.AutoButtonColor = false
+        btn.Parent = container
+
+        btn.MouseButton1Click:Connect(function()
+            if opts.Callback then opts.Callback() end
+        end)
+        btn.MouseEnter:Connect(function() tws:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().HoverColor}):Play() end)
+        btn.MouseLeave:Connect(function() tws:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().ComponentColor}):Play() end)
+    end
+
+    function win:AddSlider(id, opts)
+        local s = {Value = opts.Default or opts.Min}
+        local dragging = false
+
+        local f = Instance.new("Frame")
+        f.Size = UDim2.new(1, 0, 0, 46)
+        f.BackgroundColor3 = getTheme().ComponentColor
+        f.BorderSizePixel = 0
+        f.Parent = container
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(1, -20, 0, 24)
+        lbl.Position = UDim2.new(0, 10, 0, 4)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = opts.Title .. ": " .. tostring(s.Value)
+        lbl.TextColor3 = getTheme().TextColor
+        lbl.Font = getTheme().Font
+        lbl.TextSize = 13
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = f
+
+        local track = Instance.new("Frame")
+        track.Size = UDim2.new(1, -20, 0, 4)
+        track.Position = UDim2.new(0, 10, 0, 32)
+        track.BackgroundColor3 = getTheme().BackgroundColor
+        track.BorderSizePixel = 0
+        track.Parent = f
+
+        local fill = Instance.new("Frame")
+        fill.Size = UDim2.new((s.Value - opts.Min) / (opts.Max - opts.Min), 0, 1, 0)
+        fill.BackgroundColor3 = getTheme().MainColor
+        fill.BorderSizePixel = 0
+        fill.Parent = track
+
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 1, 0)
+        btn.BackgroundTransparency = 1
+        btn.Text = ""
+        btn.Parent = f
+
+        local function update(input)
+            local raw = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+            local val = opts.Min + raw * (opts.Max - opts.Min)
+            if opts.Rounding then
+                val = math.floor(val / opts.Rounding + 0.5) * opts.Rounding
+            else
+                val = math.floor(val + 0.5)
+            end
+            val = math.clamp(val, opts.Min, opts.Max)
+            s.Value = val
+            lbl.Text = opts.Title .. ": " .. tostring(val)
+            tws:Create(fill, TweenInfo.new(0.1), {Size = UDim2.new((val - opts.Min) / (opts.Max - opts.Min), 0, 1, 0)}):Play()
+            if opts.Callback then opts.Callback(val) end
+        end
+
+        btn.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true; update(inp)
+            end
+        end)
+        uis.InputEnded:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+        end)
+        uis.InputChanged:Connect(function(inp)
+            if dragging and inp.UserInputType == Enum.UserInputType.MouseMovement then update(inp) end
+        end)
+
+        f.MouseEnter:Connect(function() tws:Create(f, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().HoverColor}):Play() end)
+        f.MouseLeave:Connect(function() tws:Create(f, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().ComponentColor}):Play() end)
+
+        AuraUI.Options[id] = s
+        return s
+    end
+
+    function win:AddDropdown(id, opts)
+        local D = {Value = opts.Default, Name = id}
+        local opn = false
+
+        local f = Instance.new("Frame")
+        f.Size = UDim2.new(1, 0, 0, 36)
+        f.BackgroundColor3 = getTheme().ComponentColor
+        f.BorderSizePixel = 0
+        f.Parent = container
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(1, -20, 0, 36)
+        lbl.Position = UDim2.new(0, 10, 0, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = opts.Title .. ": " .. tostring(D.Value)
+        lbl.TextColor3 = getTheme().TextColor
+        lbl.Font = getTheme().Font
+        lbl.TextSize = 13
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = f
+        
+        local chevron = Instance.new("TextLabel")
+        chevron.Size = UDim2.new(0, 20, 0, 36)
+        chevron.Position = UDim2.new(1, -24, 0, 0)
+        chevron.BackgroundTransparency = 1
+        chevron.Text = "+"
+        chevron.TextColor3 = getTheme().SubTextColor
+        chevron.Font = getTheme().Font
+        chevron.TextSize = 16
+        chevron.Parent = f
+
+        local dropCont = Instance.new("Frame")
+        dropCont.Size = UDim2.new(1, 0, 0, 0)
+        dropCont.Position = UDim2.new(0, 0, 0, 36)
+        dropCont.BackgroundColor3 = getTheme().BackgroundColor
+        dropCont.BorderSizePixel = 0
+        dropCont.ClipsDescendants = true
+        dropCont.Parent = f
+        
+        local dl = Instance.new("UIListLayout")
+        dl.SortOrder = Enum.SortOrder.LayoutOrder
+        dl.Parent = dropCont
+
+        local function redraw()
+            for _, ch in ipairs(dropCont:GetChildren()) do if ch:IsA("TextButton") then ch:Destroy() end end
+            for _, val in ipairs(opts.Values) do
+                local b = Instance.new("TextButton")
+                b.Size = UDim2.new(1, 0, 0, 30)
+                b.BackgroundColor3 = getTheme().BackgroundColor
+                b.BorderSizePixel = 0
+                b.Text = "  " .. val
+                b.TextColor3 = (val == D.Value) and getTheme().MainColor or getTheme().SubTextColor
+                b.Font = getTheme().Font
+                b.TextSize = 13
+                b.TextXAlignment = Enum.TextXAlignment.Left
+                b.AutoButtonColor = false
+                b.Parent = dropCont
+
+                b.MouseButton1Click:Connect(function()
+                    D.Value = val
+                    lbl.Text = opts.Title .. ": " .. tostring(val)
+                    opn = false
+                    chevron.Text = "+"
+                    tws:Create(f, TweenInfo.new(0.15), {Size = UDim2.new(1, 0, 0, 36)}):Play()
+                    tws:Create(dropCont, TweenInfo.new(0.15), {Size = UDim2.new(1, 0, 0, 0)}):Play()
+                    redraw()
+                    if opts.Callback then opts.Callback(val) end
+                end)
+                b.MouseEnter:Connect(function() tws:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().HoverColor}):Play() end)
+                b.MouseLeave:Connect(function() tws:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().BackgroundColor}):Play() end)
+            end
+            dropCont.Size = UDim2.new(1, 0, 0, opn and (#opts.Values * 30) or 0)
+            f.Size = UDim2.new(1, 0, 0, opn and (36 + (#opts.Values * 30)) or 36)
+        end
+        redraw()
+
+        local trigger = Instance.new("TextButton")
+        trigger.Size = UDim2.new(1, 0, 0, 36)
+        trigger.BackgroundTransparency = 1
+        trigger.Text = ""
+        trigger.Parent = f
+
+        trigger.MouseButton1Click:Connect(function()
+            opn = not opn
+            chevron.Text = opn and "-" or "+"
+            tws:Create(f, TweenInfo.new(0.2), {Size = UDim2.new(1, 0, 0, opn and (36 + (#opts.Values * 30)) or 36)}):Play()
+            tws:Create(dropCont, TweenInfo.new(0.2), {Size = UDim2.new(1, 0, 0, opn and (#opts.Values * 30) or 0)}):Play()
+        end)
+        trigger.MouseEnter:Connect(function() tws:Create(f, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().HoverColor}):Play() end)
+        trigger.MouseLeave:Connect(function() tws:Create(f, TweenInfo.new(0.15), {BackgroundColor3 = getTheme().ComponentColor}):Play() end)
+
+        AuraUI.Options[id] = D
+        return D
+    end
+    
+    return win
+end
+
+return AuraUI

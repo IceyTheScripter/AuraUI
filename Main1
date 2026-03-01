@@ -176,9 +176,15 @@ function AuraUI:CreateWindow(cfg)
     table.insert(Window._reg, {obj = mf, prop = "BackgroundColor3", key = "background"}); Window.MainFrame = mf
 
     local mfSC = Instance.new("UISizeConstraint"); mfSC.MinSize = Vector2.new(570, 440); mfSC.MaxSize = Vector2.new(900, 700); mfSC.Parent = mf
-    local mfC = Instance.new("UICorner"); mfC.CornerRadius = UDim.new(0, 12); mfC.Parent = mf
-    local mfStroke = Instance.new("UIStroke"); mfStroke.Color = currentTheme.primary; mfStroke.Thickness = 1.5; mfStroke.Transparency = 0.4; mfStroke.Parent = mf
+    local mfC = Instance.new("UICorner"); mfC.CornerRadius = UDim.new(0, 8); mfC.Parent = mf
+    local mfStroke = Instance.new("UIStroke"); mfStroke.Color = currentTheme.primary; mfStroke.Thickness = 2.5; mfStroke.Transparency = 0.1; mfStroke.Parent = mf
     table.insert(Window._reg, {obj = mfStroke, prop = "Color", key = "primary"})
+
+    -- Subtler Glowing effect
+    local glow = Instance.new("ImageLabel")
+    glow.Name = "Glow"; glow.BackgroundTransparency = 1; glow.Position = UDim2.new(0, -15, 0, -15); glow.Size = UDim2.new(1, 30, 1, 30)
+    glow.ZIndex = 0; glow.Image = "rbxassetid://5028857084"; glow.ImageColor3 = currentTheme.primary; glow.ImageTransparency = 0.5; glow.ScaleType = Enum.ScaleType.Slice; glow.SliceCenter = Rect.new(24, 24, 276, 276); glow.Parent = mf
+    table.insert(Window._reg, {obj = glow, prop = "ImageColor3", key = "primary"})
 
     for i = 1, 12 do createParticle(mf) end
 
@@ -187,11 +193,11 @@ function AuraUI:CreateWindow(cfg)
     local tbC = Instance.new("UICorner"); tbC.CornerRadius = UDim.new(0, 12); tbC.Parent = topBar
 
     local tLbl = Instance.new("TextLabel"); tLbl.Size = UDim2.new(0, 250, 1, 0); tLbl.Position = UDim2.new(0, 15, 0, 0); tLbl.BackgroundTransparency = 1; tLbl.Text = cfg.Title or "Aura UI"
-    tLbl.TextColor3 = currentTheme.text; tLbl.TextSize = 17; tLbl.Font = Enum.Font.GothamBold; tLbl.TextXAlignment = Enum.TextXAlignment.Left; tLbl.ZIndex = 6; tLbl.Parent = topBar
+    tLbl.TextColor3 = currentTheme.text; tLbl.TextSize = 18; tLbl.Font = Enum.Font.GothamBold; tLbl.TextXAlignment = Enum.TextXAlignment.Left; tLbl.ZIndex = 6; tLbl.Parent = topBar
     table.insert(Window._reg, {obj = tLbl, prop = "TextColor3", key = "text"})
     
     local sbLbl = Instance.new("TextLabel"); sbLbl.Size = UDim2.new(0, 200, 1, 0); sbLbl.Position = UDim2.new(0, 145, 0, 0); sbLbl.BackgroundTransparency = 1; sbLbl.Text = cfg.SubTitle or ""
-    sbLbl.TextColor3 = currentTheme.textDim; sbLbl.TextSize = 13; sbLbl.Font = Enum.Font.Gotham; sbLbl.TextXAlignment = Enum.TextXAlignment.Left; sbLbl.ZIndex = 6; sbLbl.Parent = topBar
+    sbLbl.TextColor3 = currentTheme.textDim; sbLbl.TextSize = 12; sbLbl.Font = Enum.Font.GothamMedium; sbLbl.TextXAlignment = Enum.TextXAlignment.Left; sbLbl.ZIndex = 6; sbLbl.Parent = topBar
     table.insert(Window._reg, {obj = sbLbl, prop = "TextColor3", key = "textDim"})
 
     local bLine = Instance.new("Frame"); bLine.Size = UDim2.new(1, 0, 0, 2); bLine.Position = UDim2.new(0, 0, 1, 0); bLine.BackgroundColor3 = currentTheme.primary; bLine.BorderSizePixel = 0; bLine.ZIndex = 6; bLine.Parent = topBar
@@ -267,12 +273,13 @@ function AuraUI:CreateWindow(cfg)
     -- Tab Containers
     local tabW = cfg.TabWidth or 150
     local tCon = Instance.new("Frame"); tCon.Size = UDim2.new(0, tabW, 1, -52); tCon.Position = UDim2.new(0, 4, 0, 52); tCon.BackgroundTransparency = 1; tCon.ZIndex = 3; tCon.Parent = mf
-    local tl = Instance.new("UIListLayout"); tl.SortOrder = Enum.SortOrder.LayoutOrder; tl.Padding = UDim.new(0, 4); tl.Parent = tCon; local tp = Instance.new("UIPadding"); tp.PaddingTop = UDim.new(0, 4); tp.PaddingLeft = UDim.new(0, 4); tp.PaddingRight = UDim.new(0, 4); tp.Parent = tCon
+    local tl = Instance.new("UIListLayout"); tl.SortOrder = Enum.SortOrder.LayoutOrder; tl.Padding = UDim.new(0, 8); tl.Parent = tCon; local tp = Instance.new("UIPadding"); tp.PaddingTop = UDim.new(0, 8); tp.PaddingLeft = UDim.new(0, 4); tp.PaddingRight = UDim.new(0, 4); tp.Parent = tCon
     
-    local div = Instance.new("Frame"); div.Size = UDim2.new(0, 1, 1, -60); div.Position = UDim2.new(0, tabW + 8, 0, 56); div.BackgroundColor3 = currentTheme.primary; div.BackgroundTransparency = 0.8; div.BorderSizePixel = 0; div.Parent = mf
+    local div = Instance.new("Frame"); div.Size = UDim2.new(0, 2, 1, -66); div.Position = UDim2.new(0, tabW + 8, 0, 58); div.BackgroundColor3 = currentTheme.primary; div.BackgroundTransparency = 0.5; div.BorderSizePixel = 0; div.Parent = mf
     table.insert(Window._reg, {obj = div, prop = "BackgroundColor3", key = "primary"})
+    local divC = Instance.new("UICorner"); divC.CornerRadius = UDim.new(1, 0); divC.Parent = div
 
-    local cCon = Instance.new("Frame"); cCon.Size = UDim2.new(1, -(tabW + 18), 1, -60); cCon.Position = UDim2.new(0, tabW + 14, 0, 56); cCon.BackgroundTransparency = 1; cCon.ClipsDescendants = true; cCon.Parent = mf
+    local cCon = Instance.new("Frame"); cCon.Size = UDim2.new(1, -(tabW + 20), 1, -60); cCon.Position = UDim2.new(0, tabW + 16, 0, 56); cCon.BackgroundTransparency = 1; cCon.ClipsDescendants = true; cCon.Parent = mf
 
     -- Setup Theme Applier
     function Window:SetTheme(name)
@@ -310,10 +317,10 @@ function AuraUI:CreateWindow(cfg)
 
         local function baseObj(h)
             local f = Instance.new("Frame"); f.Size = UDim2.new(1, 0, 0, h); f.BackgroundColor3 = currentTheme.element; f.Parent = sFrame
-            local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 8); c.Parent = f
-            local s = Instance.new("UIStroke"); s.Color = currentTheme.primary; s.Thickness = 1; s.Transparency = 0.85; s.Parent = f
+            local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 6); c.Parent = f
+            local s = Instance.new("UIStroke"); s.Color = currentTheme.primary; s.Thickness = 1.5; s.Transparency = 0.6; s.Parent = f
             table.insert(Window._reg, {obj = f, prop = "BackgroundColor3", key = "element"}); table.insert(Window._reg, {obj = s, prop = "Color", key = "primary"})
-            f.MouseEnter:Connect(function() tw(s, {Transparency = 0.4}, 0.15) end); f.MouseLeave:Connect(function() tw(s, {Transparency = 0.85}, 0.15) end)
+            f.MouseEnter:Connect(function() tw(s, {Transparency = 0.2}, 0.15) end); f.MouseLeave:Connect(function() tw(s, {Transparency = 0.6}, 0.15) end)
             return f
         end
 
@@ -416,7 +423,7 @@ function AuraUI:CreateWindow(cfg)
                     local oc = Instance.new("UICorner"); oc.CornerRadius = UDim.new(0, 6); oc.Parent = ob
                     ob.MouseButton1Click:Connect(function()
                         D.Value = val; t.Text = (c.Title and (c.Title .. "  (" .. val .. ")") or val)
-                        if not c.Multi then opn = false; tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.25); tw(arr, {Rotation = 0}, 0.25); scr.Visible = false end
+                        opn = false; tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.25); tw(arr, {Rotation = 0}, 0.25); task.wait(0.26); scr.Visible = false
                         if c.Callback then c.Callback(val) end
                     end)
                     ob.MouseEnter:Connect(function() tw(ob, {BackgroundColor3 = currentTheme.primary}, 0.15) end); ob.MouseLeave:Connect(function() tw(ob, {BackgroundColor3 = currentTheme.element}, 0.15) end)
@@ -424,7 +431,7 @@ function AuraUI:CreateWindow(cfg)
             end
             redraw(); if D.Value then t.Text = c.Title and (c.Title .. "  (" .. D.Value .. ")") or D.Value end
             
-            local bt = Instance.new("TextButton"); bt.Size = UDim2.new(1, 0, 0, 38); bt.BackgroundTransparency = 1; bt.Text = ""; bt.ZIndex = 5; bt.Parent = f
+            local bt = Instance.new("TextButton"); bt.Size = UDim2.new(1, -26, 0, 38); bt.BackgroundTransparency = 1; bt.Text = ""; bt.ZIndex = 5; bt.Parent = f
             bt.MouseButton1Click:Connect(function()
                 opn = not opn
                 if opn then
@@ -499,6 +506,14 @@ function AuraUI:CreateWindow(cfg)
             upd()
 
             sw.MouseButton1Click:Connect(function()
+                opn = not opn
+                if opn then pan.Visible = true; tw(pan, {Size = UDim2.new(1, 0, 0, 144)}, 0.25); tw(f, {Size = UDim2.new(1, 0, 0, 192)}, 0.25)
+                else tw(pan, {Size = UDim2.new(1, 0, 0, 0)}, 0.2); tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.2); task.wait(0.22); pan.Visible = false end
+            end)
+            
+            -- Adding an explicit Confirm button for colorpickers
+            local cBtn = Instance.new("TextButton"); cBtn.Size = UDim2.new(1, -26, 0, 38); cBtn.BackgroundTransparency = 1; cBtn.Text = ""; cBtn.ZIndex = 5; cBtn.Parent = f
+            cBtn.MouseButton1Click:Connect(function()
                 opn = not opn
                 if opn then pan.Visible = true; tw(pan, {Size = UDim2.new(1, 0, 0, 144)}, 0.25); tw(f, {Size = UDim2.new(1, 0, 0, 192)}, 0.25)
                 else tw(pan, {Size = UDim2.new(1, 0, 0, 0)}, 0.2); tw(f, {Size = UDim2.new(1, 0, 0, 38)}, 0.2); task.wait(0.22); pan.Visible = false end

@@ -64,10 +64,10 @@ AuraUI.Options = {}
 AuraUI.Toggled = true
 AuraUI.ThemeObjects = {}
 AuraUI.Sounds = {
-    Hover = "rbxassetid://1339159378376466",
+    Hover = "rbxassetid://127105730240202",
     Click = "rbxassetid://140387697208266",
     MenuOpen = "rbxassetid://9120728815",
-    Toggle = "rbxassetid://130452431655432",  
+    Toggle = "rbxassetid://132465969238702",  
     Notify = "rbxassetid://131039887376992", 
     Slide = "rbxassetid://102171486321955"
 }

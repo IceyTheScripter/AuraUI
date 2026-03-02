@@ -793,8 +793,7 @@ function AuraUI:CreateWindow(config)
             function GB:AddDropdown(id, opts) 
                 local Drp = {Value = opts.Default, Values = opts.Values} 
                 local open = false 
-                local focused = false   -- whether this dropdown is keyboard-focused
-                local justSelected = false
+                local focused = false   -- whether this dropdown is keyboard-focused 
  
                 local Wrap = Instance.new("Frame") 
                 Wrap.Size = UDim2.new(1, 0, 0, 36) 
@@ -886,8 +885,8 @@ function AuraUI:CreateWindow(config)
                 List.BackgroundColor3 = AuraUI.Theme.Groupbox 
                 List.BorderSizePixel = 0 
                 List.ZIndex = 2000 
-                List.Active = true 
-                List.ClipsDescendants = true 
+                List.Active = false 
+                List.ClipsDescendants = false 
                 List.Visible = false 
                 List.Parent = gui 
                 Reg(List, "BackgroundColor3", "Groupbox") 
@@ -941,10 +940,8 @@ function AuraUI:CreateWindow(config)
                         Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency = 0.3}, 0.1) end) 
                         Opt.MouseLeave:Connect(function() Tween(Opt, {BackgroundTransparency = (val==Drp.Value) and 0.4 or 1}, 0.1) end) 
                         Opt.MouseButton1Click:Connect(function() 
-                            justSelected = true 
                             PlaySound(AuraUI.Sounds.Click, 0.22, 1.15) 
                             SetValue(val) 
-                            task.delay(0.15, function() justSelected = false end)
                             CloseList() 
                         end) 
                     end 
@@ -1007,19 +1004,20 @@ function AuraUI:CreateWindow(config)
                     elseif inp.KeyCode == Enum.KeyCode.Escape and open then CloseList() end 
                 end) 
 
-               UserInputService.InputBegan:Connect(function(inp)
-                   if inp.UserInputType == Enum.UserInputType.MouseButton1 and open then
-                       task.delay(0.05, function()
-                           if not open or justSelected then return end
-                           local mp = UserInputService:GetMouseLocation()
-                           local a1 = List.AbsolutePosition; local s1 = List.AbsoluteSize
-                           local a2 = BtnF.AbsolutePosition; local s2 = BtnF.AbsoluteSize
-                           local inList = mp.X >= a1.X and mp.X <= a1.X+s1.X and mp.Y >= a1.Y and mp.Y <= a1.Y+s1.Y
-                           local inBtn  = mp.X >= a2.X and mp.X <= a2.X+s2.X and mp.Y >= a2.Y and mp.Y <= a2.Y+s2.Y
-                           if not inList and not inBtn then
-                               CloseList()
-                           end
-                       end)
+                -- Close on any click outside (deferred so option's own click fires first)
+                UserInputService.InputBegan:Connect(function(inp)
+                    if inp.UserInputType == Enum.UserInputType.MouseButton1 and open then
+                        task.defer(function()
+                            if not open then return end
+                            local mp = UserInputService:GetMouseLocation()
+                            local a1 = List.AbsolutePosition; local s1 = List.AbsoluteSize
+                            local a2 = BtnF.AbsolutePosition; local s2 = BtnF.AbsoluteSize
+                            local inList = mp.X >= a1.X and mp.X <= a1.X+s1.X and mp.Y >= a1.Y and mp.Y <= a1.Y+s1.Y
+                            local inBtn  = mp.X >= a2.X and mp.X <= a2.X+s2.X and mp.Y >= a2.Y and mp.Y <= a2.Y+s2.Y
+                            if not inList and not inBtn then
+                                CloseList()
+                            end
+                        end)
                     end
                 end)
                 function Drp:Refresh()

@@ -209,39 +209,36 @@ function AuraUI:CreateWindow(config)
  
     -- ── Main window ─────────────────────────────────────────────────────────
     local Win = Instance.new("Frame") 
+    Win.Name = "MainWindow"
     Win.Size = UDim2.new(0, 680, 0, 440) 
     Win.Position = UDim2.new(0.5, -340, 0.5, -220) 
     Win.BackgroundColor3 = T.Window 
     Win.BackgroundTransparency = 0 
     Win.BorderSizePixel = 0 
     Win.ClipsDescendants = true 
+    Win.Visible = true
+    Win.ZIndex = 10
     Win.Parent = gui 
+    
     Reg(Win, "BackgroundColor3", "Window") 
     Corner(Win, 6)
+    
     local WinStroke = MakeStroke(Win, T.Border, 1) 
+    WinStroke.Transparency = 0 -- Make it solid for now to be sure
     Reg(WinStroke, "Color", "Border") 
+    
     AddGradient(Win, 45)
-
-    local WinShadow = Instance.new("ImageLabel")
-    WinShadow.Name = "Shadow"
-    WinShadow.AnchorPoint = Vector2.new(0.5, 0.5)
-    WinShadow.Position = UDim2.new(0.5, 0, 0.5, 0)
-    WinShadow.Size = UDim2.new(1, 30, 1, 30)
-    WinShadow.BackgroundTransparency = 1
-    WinShadow.Image = "rbxassetid://5554236805"
-    WinShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    WinShadow.ImageTransparency = 0.65
-    WinShadow.ZIndex = Win.ZIndex - 1
-    WinShadow.Parent = gui
 
     -- ── Topbar  (h=28) ──────────────────────────────────────────────────────
     local Topbar = Instance.new("Frame") 
+    Topbar.Name = "Header"
     Topbar.Size = UDim2.new(1, 0, 0, 28) 
     Topbar.BackgroundColor3 = T.Topbar 
     Topbar.BackgroundTransparency = 0 
     Topbar.BorderSizePixel = 0 
-    Topbar.ZIndex = 5 
+    Topbar.ZIndex = 15 
     Topbar.Parent = Win 
+    
     Reg(Topbar, "BackgroundColor3", "Topbar") 
     MakeDraggable(Topbar, Win) 
     AddGradient(Topbar)

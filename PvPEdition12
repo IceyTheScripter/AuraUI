@@ -793,7 +793,8 @@ function AuraUI:CreateWindow(config)
             function GB:AddDropdown(id, opts) 
                 local Drp = {Value = opts.Default, Values = opts.Values} 
                 local open = false 
-                local focused = false   -- whether this dropdown is keyboard-focused 
+                local focused = false   -- whether this dropdown is keyboard-focused
+                local justSelected = false
  
                 local Wrap = Instance.new("Frame") 
                 Wrap.Size = UDim2.new(1, 0, 0, 36) 
@@ -913,24 +914,13 @@ function AuraUI:CreateWindow(config)
                     if opts.Callback then opts.Callback(val) end 
                 end 
 
-                local Shield = Instance.new("TextButton")
-                Shield.Size = UDim2.new(2, 0, 2, 0)
-                Shield.Position = UDim2.new(-0.5, 0, -0.5, 0)
-                Shield.BackgroundTransparency = 1
-                Shield.Text = ""
-                Shield.Visible = false
-                Shield.ZIndex = 1999
-                Shield.Parent = gui
-
                 local function CloseList()
-                    open = false; List.Visible = false; Shield.Visible = false
+                    open = false; List.Visible = false
                     Wrap.ZIndex = 10
                     ArrowIco.Text = "▼"
                     Tween(bfs, {Color = AuraUI.Theme.Stroke}, 0.1)
                     focused = false
                 end
-
-                Shield.MouseButton1Click:Connect(CloseList)
 
                 local function Build() 
                     for _, c in ipairs(List:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end 
@@ -951,8 +941,10 @@ function AuraUI:CreateWindow(config)
                         Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency = 0.3}, 0.1) end) 
                         Opt.MouseLeave:Connect(function() Tween(Opt, {BackgroundTransparency = (val==Drp.Value) and 0.4 or 1}, 0.1) end) 
                         Opt.MouseButton1Click:Connect(function() 
+                            justSelected = true 
                             PlaySound(AuraUI.Sounds.Click, 0.22, 1.15) 
                             SetValue(val) 
+                            task.delay(0.15, function() justSelected = false end)
                             CloseList() 
                         end) 
                     end 
@@ -969,7 +961,6 @@ function AuraUI:CreateWindow(config)
                     if open then
                         Wrap.ZIndex = 100
                         Build()
-                        Shield.Visible = true
                         List.Visible = true 
                         ArrowIco.Text = "▲" 
                         Tween(bfs, {Color = AuraUI.Theme.Primary}, 0.1) 
@@ -1015,6 +1006,22 @@ function AuraUI:CreateWindow(config)
                     elseif inp.KeyCode == Enum.KeyCode.Right then CycleNext() 
                     elseif inp.KeyCode == Enum.KeyCode.Escape and open then CloseList() end 
                 end) 
+
+               UserInputService.InputBegan:Connect(function(inp)
+                   if inp.UserInputType == Enum.UserInputType.MouseButton1 and open then
+                       task.delay(0.05, function()
+                           if not open or justSelected then return end
+                           local mp = UserInputService:GetMouseLocation()
+                           local a1 = List.AbsolutePosition; local s1 = List.AbsoluteSize
+                           local a2 = BtnF.AbsolutePosition; local s2 = BtnF.AbsoluteSize
+                           local inList = mp.X >= a1.X and mp.X <= a1.X+s1.X and mp.Y >= a1.Y and mp.Y <= a1.Y+s1.Y
+                           local inBtn  = mp.X >= a2.X and mp.X <= a2.X+s2.X and mp.Y >= a2.Y and mp.Y <= a2.Y+s2.Y
+                           if not inList and not inBtn then
+                               CloseList()
+                           end
+                       end)
+                    end
+                end)
                 function Drp:Refresh()
                     if Drp.Value and not table.find(Drp.Values, Drp.Value) then 
                         Drp.Value = Drp.Values[1] or nil 
@@ -1185,23 +1192,6 @@ function AuraUI:CreateWindow(config)
                 List2.Visible = false; List2.Parent = gui 
                 Reg(List2, "BackgroundColor3", "Groupbox"); Corner(List2, 4) 
                 local ls2 = MakeStroke(List2, AuraUI.Theme.Stroke); Reg(ls2, "Color", "Stroke") 
-
-                local Shield2 = Instance.new("TextButton")
-                Shield2.Size = UDim2.new(2, 0, 2, 0)
-                Shield2.Position = UDim2.new(-0.5, 0, -0.5, 0)
-                Shield2.BackgroundTransparency = 1
-                Shield2.Text = ""
-                Shield2.Visible = false
-                Shield2.ZIndex = 1999
-                Shield2.Parent = gui
-
-                local function CloseList2()
-                    open2 = false; List2.Visible = false; Shield2.Visible = false
-                    Wrap.ZIndex = 10; Arr2.Text = "▼"
-                    Tween(bfs2, {Color = AuraUI.Theme.Stroke}, 0.1)
-                end
-
-                Shield2.MouseButton1Click:Connect(CloseList2)
  
                 local ML = Instance.new("UIListLayout"); ML.SortOrder = Enum.SortOrder.LayoutOrder; ML.Parent = List2 
                 local MP = Instance.new("UIPadding") 
@@ -1249,9 +1239,7 @@ function AuraUI:CreateWindow(config)
                     open2 = not open2
                     if open2 then
                         Wrap.ZIndex = 100
-                        Build2()
-                        Shield2.Visible = true
-                        List2.Visible = true
+                        Build2(); List2.Visible = true
                         Arr2.Text = "▲"
                         Tween(bfs2, {Color = AuraUI.Theme.Primary}, 0.1)
                     else
@@ -1259,91 +1247,22 @@ function AuraUI:CreateWindow(config)
                     end
                 end) 
 
-                -- Added aliases for compatibility
-                function GB:AddSection(name) return GB:AddLabel(name) end
-                function GB:AddTextInput(id, opts) return GB:AddInput(id, opts) end
-
-                function GB:AddColorPicker(id, opts)
-                    local CP = {Value = opts.Default or Color3.fromRGB(255, 255, 255)}
-                    local open = false
-                    
-                    local Wrap = Instance.new("Frame")
-                    Wrap.Size = UDim2.new(1, 0, 0, 24)
-                    Wrap.BackgroundTransparency = 1
-                    Wrap.ClipsDescendants = true
-                    Wrap.Parent = Cnt
-
-                    local Lbl = Instance.new("TextLabel")
-                    Lbl.Size = UDim2.new(1, -38, 1, 0)
-                    Lbl.BackgroundTransparency = 1
-                    Lbl.Text = opts.Title
-                    Lbl.Font = Enum.Font.Gotham; Lbl.TextSize = 13
-                    Lbl.TextXAlignment = Enum.TextXAlignment.Left
-                    Lbl.Parent = Wrap
-                    Reg(Lbl, "TextColor3", "Text")
-
-                    local Disp = Instance.new("TextButton")
-                    Disp.Size = UDim2.new(0, 32, 0, 16)
-                    Disp.Position = UDim2.new(1, -32, 0.5, -8)
-                    Disp.BackgroundColor3 = CP.Value
-                    Disp.Text = ""
-                    Disp.AutoButtonColor = false
-                    Disp.Parent = Wrap
-                    Corner(Disp, 4)
-                    local ds = MakeStroke(Disp, AuraUI.Theme.Stroke)
-                    Reg(ds, "Color", "Stroke")
-
-                    local Picker = Instance.new("Frame")
-                    Picker.Size = UDim2.new(1, 0, 0, 130)
-                    Picker.Position = UDim2.new(0, 0, 0, 24)
-                    Picker.BackgroundTransparency = 1
-                    Picker.Parent = Wrap
-
-                    local function makeS(y, label)
-                        local row = Instance.new("Frame")
-                        row.Size = UDim2.new(1, 0, 0, 20)
-                        row.Position = UDim2.new(0, 0, 0, y)
-                        row.BackgroundTransparency = 1
-                        row.Parent = Picker
-
-                        local l = Instance.new("TextLabel")
-                        l.Size = UDim2.new(0, 24, 1, 0)
-                        l.BackgroundTransparency = 1
-                        l.Text = label
-                        l.Font = Enum.Font.GothamBold; l.TextSize = 10
-                        l.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-                        l.Parent = row
-
-                        local bg = Instance.new("Frame")
-                        bg.Size = UDim2.new(1, -30, 0, 6)
-                        bg.Position = UDim2.new(0, 26, 0.5, -3)
-                        bg.BackgroundColor3 = AuraUI.Theme.InputBg
-                        bg.BorderSizePixel = 0; bg.Parent = row
-                        Reg(bg, "BackgroundColor3", "InputBg"); Corner(bg, 3)
-
-                        local fill = Instance.new("Frame")
-                        fill.Size = UDim2.new(0.5, 0, 1, 0)
-                        fill.BackgroundColor3 = AuraUI.Theme.Primary
-                        fill.BorderSizePixel = 0; fill.Parent = bg
-                        Corner(fill, 3)
-                        return fill
+                -- Close on any click outside (deferred so option click fires first)
+                UserInputService.InputBegan:Connect(function(inp)
+                    if inp.UserInputType == Enum.UserInputType.MouseButton1 and open2 then
+                        task.defer(function()
+                            if not open2 then return end
+                            local mp = UserInputService:GetMouseLocation()
+                            local a1 = List2.AbsolutePosition; local s1 = List2.AbsoluteSize
+                            local a2 = BtnF.AbsolutePosition;  local s2 = BtnF.AbsoluteSize
+                            local inList = mp.X >= a1.X and mp.X <= a1.X+s1.X and mp.Y >= a1.Y and mp.Y <= a1.Y+s1.Y
+                            local inBtn  = mp.X >= a2.X and mp.X <= a2.X+s2.X and mp.Y >= a2.Y and mp.Y <= a2.Y+s2.Y
+                            if not inList and not inBtn then
+                                CloseList2()
+                            end
+                        end)
                     end
-
-                    local rF = makeS(10, "R"); local gF = makeS(35, "G"); local bF = makeS(60, "B")
-
-                    local function upd()
-                        Disp.BackgroundColor3 = CP.Value
-                        if opts.Callback then opts.Callback(CP.Value) end
-                    end
-
-                    Disp.MouseButton1Click:Connect(function()
-                        open = not open
-                        Tween(Wrap, {Size = UDim2.new(1, 0, 0, open and 154 or 24)}, 0.2)
-                    end)
-
-                    AuraUI.Options[id] = CP
-                    return CP
-                end
+                end)
                 function MD:Set(v)
                     MD.Value = v
                     BtnLbl.Text = getLabel()

@@ -908,19 +908,20 @@ function AuraUI:CreateWindow(config)
                     List.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y) 
                 end 
 
-                -- Open/close 
                 BtnF.MouseButton1Click:Connect(function() 
                     open = not open 
-                    if open then
-                        Wrap.ZIndex = 100
-                        Build()
-                        List.Visible = true 
+                    if open then 
+                        Build() 
+                        local h = math.min(ListLayout.AbsoluteContentSize.Y + 40, 160) 
+                        Tween(Wrap, {Size = UDim2.new(1, 0, 0, h)}, 0.3) 
                         ArrowIco.Text = "▲" 
-                        Tween(bfs, {Color = AuraUI.Theme.Primary}, 0.1) 
-                        focused = true
-                    else
-                        CloseList()
-                    end
+                        focused = true 
+                    else 
+                        open = false 
+                        Tween(Wrap, {Size = UDim2.new(1, 0, 0, 36)}, 0.25) 
+                        ArrowIco.Text = "▼" 
+                        focused = false 
+                    end 
                 end) 
  
                 local function Cycle(dir) 
@@ -932,8 +933,8 @@ function AuraUI:CreateWindow(config)
                 end 
 
 
-                LeftArrow.MouseButton1Click:Connect(CyclePrev) 
-                RightArrow.MouseButton1Click:Connect(CycleNext) 
+                LeftArrow.MouseButton1Click:Connect(function() Cycle(-1) end) 
+                RightArrow.MouseButton1Click:Connect(function() Cycle(1) end) 
 
                 LeftArrow.MouseEnter:Connect(function() Tween(LeftArrow, {TextColor3 = AuraUI.Theme.Primary}, 0.1) end) 
                 LeftArrow.MouseLeave:Connect(function() Tween(LeftArrow, {TextColor3 = AuraUI.Theme.TextMuted}, 0.1) end) 
@@ -943,42 +944,23 @@ function AuraUI:CreateWindow(config)
                 BtnF.MouseEnter:Connect(function() focused = true end) 
                 BtnF.MouseLeave:Connect(function() if not open then focused = false end end)
 
-                -- Keyboard shortcuts 
                 UserInputService.InputBegan:Connect(function(inp, gpe) 
                     if not focused or gpe then return end 
-                    if inp.KeyCode == Enum.KeyCode.Left then CyclePrev() 
-                    elseif inp.KeyCode == Enum.KeyCode.Right then CycleNext() 
-                    elseif inp.KeyCode == Enum.KeyCode.Escape and open then CloseList() end 
+                    if inp.KeyCode == Enum.KeyCode.Left then Cycle(-1) 
+                    elseif inp.KeyCode == Enum.KeyCode.Right then Cycle(1) 
+                    elseif inp.KeyCode == Enum.KeyCode.Escape and open then 
+                        open = false; Tween(Wrap, {Size = UDim2.new(1, 0, 0, 36)}, 0.2) 
+                        ArrowIco.Text = "▼" 
+                    end 
                 end) 
 
-                -- Close on any click outside (deferred so option's own click fires first)
-                UserInputService.InputBegan:Connect(function(inp)
-                    if inp.UserInputType == Enum.UserInputType.MouseButton1 and open then
-                        task.defer(function()
-                            if not open then return end
-                            local mp = UserInputService:GetMouseLocation()
-                            local a1 = List.AbsolutePosition; local s1 = List.AbsoluteSize
-                            local a2 = BtnF.AbsolutePosition; local s2 = BtnF.AbsoluteSize
-                            local inList = mp.X >= a1.X and mp.X <= a1.X+s1.X and mp.Y >= a1.Y and mp.Y <= a1.Y+s1.Y
-                            local inBtn  = mp.X >= a2.X and mp.X <= a2.X+s2.X and mp.Y >= a2.Y and mp.Y <= a2.Y+s2.Y
-                            if not inList and not inBtn then
-                                CloseList()
-                            end
-                        end)
-                    end
-                end)
-                function Drp:Refresh()
-                    if Drp.Value and not table.find(Drp.Values, Drp.Value) then 
-                        Drp.Value = Drp.Values[1] or nil 
-                        BtnLbl.Text = tostring(Drp.Value or "None") 
-                    end 
-                    if open then Build() end 
-                end
-
-                function Drp:Set(val) 
-                    SetValue(val) 
+                function Drp:Refresh(newVals) 
+                    Drp.Values = newVals or Drp.Values 
+                    if not table.find(Drp.Values, Drp.Value) then SetValue(Drp.Values[1]) end 
                     if open then Build() end 
                 end 
+
+                function Drp:Set(v) SetValue(v); if open then Build() end end 
 
                 AuraUI.Options[id] = Drp 
                 return Drp 

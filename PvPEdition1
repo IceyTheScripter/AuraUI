@@ -25,24 +25,24 @@ local isfile     = isfile     or function() return false end
 -- ─── Themes (More Modern Colors) ────────────────────────────────────────────
 AuraUI.Themes = { 
     ["Default"] = { 
-        Window       = Color3.fromRGB(18, 18, 22), 
-        Topbar       = Color3.fromRGB(24, 24, 28), 
-        TabBar       = Color3.fromRGB(24, 24, 28), 
-        TabBtnActive = Color3.fromRGB(40, 40, 48), 
-        TabBtnHover  = Color3.fromRGB(32, 32, 38), 
-        Groupbox     = Color3.fromRGB(22, 22, 26), 
-        GroupHeader  = Color3.fromRGB(28, 28, 34), 
-        Element      = Color3.fromRGB(32, 32, 38), 
-        InputBg      = Color3.fromRGB(14, 14, 18), 
-        Primary      = Color3.fromRGB(88, 140, 255), 
-        Toggle_On    = Color3.fromRGB(88, 140, 255), 
-        Toggle_Off   = Color3.fromRGB(42, 42, 48), 
-        Text         = Color3.fromRGB(245, 245, 250), 
-        TextMuted    = Color3.fromRGB(160, 160, 170), 
-        TextDim      = Color3.fromRGB(110, 110, 120), 
-        Border       = Color3.fromRGB(38, 38, 45), 
-        Stroke       = Color3.fromRGB(45, 45, 52), 
-    }, 
+        Window       = Color3.fromRGB(20, 20, 24), 
+        Topbar       = Color3.fromRGB(26, 26, 32), 
+        TabBar       = Color3.fromRGB(26, 26, 32), 
+        TabBtnActive = Color3.fromRGB(45, 50, 65), 
+        TabBtnHover  = Color3.fromRGB(35, 38, 48), 
+        Groupbox     = Color3.fromRGB(24, 24, 30), 
+        GroupHeader  = Color3.fromRGB(30, 32, 40), 
+        Element      = Color3.fromRGB(32, 34, 42), 
+        InputBg      = Color3.fromRGB(16, 16, 20), 
+        Primary      = Color3.fromRGB(90, 160, 255),
+        Toggle_On    = Color3.fromRGB(90, 160, 255), 
+        Toggle_Off   = Color3.fromRGB(40, 42, 50), 
+        Text         = Color3.fromRGB(250, 250, 255), 
+        TextMuted    = Color3.fromRGB(160, 165, 180), 
+        TextDim      = Color3.fromRGB(100, 105, 120), 
+        Border       = Color3.fromRGB(45, 48, 60), 
+        Stroke       = Color3.fromRGB(60, 65, 80), 
+    },
     ["Dark Blue"] = { 
         Window       = Color3.fromRGB(14, 16, 24), 
         Topbar       = Color3.fromRGB(20, 23, 36), 
@@ -154,7 +154,22 @@ local function MakeStroke(parent, color, thick)
     s.Parent = parent 
     return s 
 end 
- 
+
+local function AddGradient(parent, angle)
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 220, 220))
+    }
+    gradient.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.92),
+        NumberSequenceKeypoint.new(1, 0.98)
+    }
+    gradient.Rotation = angle or 90
+    gradient.Parent = parent
+    return gradient
+end
+
 local function MakeDraggable(bar, frame) 
     local drag, start, sPos 
     bar.InputBegan:Connect(function(i) 
@@ -201,11 +216,11 @@ function AuraUI:CreateWindow(config)
     Win.ClipsDescendants = true 
     Win.Parent = gui 
     Reg(Win, "BackgroundColor3", "Window") 
-    Corner(Win, 8) 
+    Corner(Win, 6)
     local WinStroke = MakeStroke(Win, T.Border, 1) 
     Reg(WinStroke, "Color", "Border") 
- 
-    -- Shadow
+    AddGradient(Win, 45)
+
     local WinShadow = Instance.new("ImageLabel")
     WinShadow.Name = "Shadow"
     WinShadow.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -234,8 +249,10 @@ function AuraUI:CreateWindow(config)
     TopbarLine.BackgroundColor3 = T.Border 
     TopbarLine.BorderSizePixel = 0 
     TopbarLine.ZIndex = 5 
-    TopbarLine.Parent = Topbar 
-    Reg(TopbarLine, "BackgroundColor3", "Border") 
+    Topbar.Parent = Win 
+    Reg(Topbar, "BackgroundColor3", "Topbar") 
+    MakeDraggable(Topbar, Win) 
+    AddGradient(Topbar) 
  
     local TopAccent = Instance.new("Frame") 
     TopAccent.Size = UDim2.new(0, 3, 1, 0) 
@@ -525,9 +542,10 @@ function AuraUI:CreateWindow(config)
             Box.BorderSizePixel = 0 
             Box.Parent = column 
             Reg(Box, "BackgroundColor3", "Groupbox") 
-            Corner(Box, 6) 
+            Corner(Box, 5) 
             local BoxStroke = MakeStroke(Box, AuraUI.Theme.Stroke) 
             Reg(BoxStroke, "Color", "Stroke") 
+            AddGradient(Box)
  
             local Hdr = Instance.new("Frame") 
             Hdr.Size = UDim2.new(1, 0, 0, 24) 
@@ -581,16 +599,16 @@ function AuraUI:CreateWindow(config)
             Cnt.Parent = Box 
  
             local CntPad = Instance.new("UIPadding") 
-            CntPad.PaddingTop    = UDim.new(0, 8) 
-            CntPad.PaddingBottom = UDim.new(0, 10) 
-            CntPad.PaddingLeft   = UDim.new(0, 10) 
-            CntPad.PaddingRight  = UDim.new(0, 10) 
+            CntPad.PaddingTop    = UDim.new(0, 14)  -- MORE!
+            CntPad.PaddingBottom = UDim.new(0, 14) 
+            CntPad.PaddingLeft   = UDim.new(0, 14) 
+            CntPad.PaddingRight  = UDim.new(0, 14) 
             CntPad.Parent = Cnt 
  
             local CntLayout = Instance.new("UIListLayout") 
             CntLayout.SortOrder = Enum.SortOrder.LayoutOrder 
-            CntLayout.Padding = UDim.new(0, 7) 
-            CntLayout.Parent = Cnt 
+            CntLayout.Padding = UDim.new(0, 10)  -- DOUBLE!
+            CntLayout.Parent = Cnt
  
             -- ── Toggle ──────────────────────────────────────────────────────
             function GB:AddToggle(id, opts) 
@@ -668,9 +686,10 @@ function AuraUI:CreateWindow(config)
                 B.Parent = Cnt 
                 Reg(B, "BackgroundColor3", "Element") 
                 Reg(B, "TextColor3", "Text") 
-                Corner(B, 6) 
+                Corner(B, 4) 
                 local bs = MakeStroke(B, AuraUI.Theme.Stroke) 
                 Reg(bs, "Color", "Stroke") 
+                AddGradient(B)
  
                 B.MouseEnter:Connect(function() 
                     PlaySound(AuraUI.Sounds.Hover, 0.05, 1) 
@@ -940,14 +959,23 @@ function AuraUI:CreateWindow(config)
                         Corner(Opt, 4) 
                         Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency = 0.2}, 0.1) end) 
                         Opt.MouseLeave:Connect(function() Tween(Opt, {BackgroundTransparency = (val==Drp.Value) and 0.3 or 1}, 0.1) end) 
-                        Opt.MouseButton1Click:Connect(function() 
-                            PlaySound(AuraUI.Sounds.Click, 0.22, 1.15) 
-                            SetValue(val) 
-                            CloseList() 
-                        end) 
-                    end 
-                    
-                    -- ✅ FIXED: Proper height calculation!
+                                               Opt.MouseButton1Click:Connect(function() 
+                            PlaySound(AuraUI.Sounds.Click, 0.22, 1.15)  
+                            
+                            Drp.Value = val
+                            BtnLbl.Text = tostring(val)
+                            
+                            if not Drp.Multi then
+                                CloseList()
+                            end
+                           
+                            Build()
+                           
+                            if opts.Callback then
+                                opts.Callback(val)
+                            end
+                        end)
+                   
                     local itemCount = #Drp.Values
                     local itemHeight = 24
                     local padding = 8
@@ -962,7 +990,6 @@ function AuraUI:CreateWindow(config)
                     List.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
                 end 
 
-                -- ✅ FIXED: Smooth open/close animation!
                 BtnF.MouseButton1Click:Connect(function() 
                     open = not open 
                     PlaySound(AuraUI.Sounds.Click, 0.25, open and 1.15 or 0.95)

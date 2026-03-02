@@ -885,7 +885,7 @@ function AuraUI:CreateWindow(config)
                 List.BackgroundColor3 = AuraUI.Theme.Groupbox 
                 List.BorderSizePixel = 0 
                 List.ZIndex = 2000 
-                List.Active = false 
+                List.Active = true 
                 List.ClipsDescendants = false 
                 List.Visible = false 
                 List.Parent = gui 

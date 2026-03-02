@@ -12,7 +12,7 @@ local HttpService      = game:GetService("HttpService")
 local Players          = game:GetService("Players") 
 local Debris           = game:GetService("Debris") 
  
-local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait() 
+local LocalPlayer = Players.LocalPlayer 
 local Mouse       = LocalPlayer:GetMouse() 
  
 local writefile  = writefile  or function() end 
@@ -207,26 +207,18 @@ function AuraUI:CreateWindow(config)
     pcall(function() if syn then syn.protect_gui(gui) end end) 
     gui.Parent = (gethui and gethui()) or CoreGui 
  
-    -- ── Main window ─────────────────────────────────────────────────────────
+    -- ── Main window ─────────────────────────────────────────────────────────── 
     local Win = Instance.new("Frame") 
-    Win.Name = "MainWindow"
     Win.Size = UDim2.new(0, 680, 0, 440) 
     Win.Position = UDim2.new(0.5, -340, 0.5, -220) 
     Win.BackgroundColor3 = T.Window 
-    Win.BackgroundTransparency = 0 
     Win.BorderSizePixel = 0 
     Win.ClipsDescendants = true 
-    Win.Visible = true
-    Win.ZIndex = 10
     Win.Parent = gui 
-    
     Reg(Win, "BackgroundColor3", "Window") 
-    Corner(Win, 6)
-    
+    Corner(Win, 6) 
     local WinStroke = MakeStroke(Win, T.Border, 1) 
-    WinStroke.Transparency = 0 -- Make it solid for now to be sure
     Reg(WinStroke, "Color", "Border") 
-    
     AddGradient(Win, 45)
 
     -- ── Topbar  (h=28) ──────────────────────────────────────────────────────

@@ -1569,3 +1569,4 @@ end
  
 if getgenv then getgenv().AuraUI = AuraUI end
 return AuraUI
+end

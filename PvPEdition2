@@ -162,8 +162,8 @@ local function AddGradient(parent, angle)
         ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 220, 220))
     }
     gradient.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.92),
-        NumberSequenceKeypoint.new(1, 0.98)
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(1, 0.1)
     }
     gradient.Rotation = angle or 90
     gradient.Parent = parent

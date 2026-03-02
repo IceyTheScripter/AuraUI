@@ -156,7 +156,18 @@ local function MakeStroke(parent, color, thick)
 end 
 
 local function AddGradient(parent, angle)
-    -- Disabled for visibility debugging
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 220, 220))
+    }
+    gradient.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(1, 0.1)
+    }
+    gradient.Rotation = angle or 90
+    gradient.Parent = parent
+    return gradient
 end
 
 local function MakeDraggable(bar, frame) 
@@ -200,13 +211,16 @@ function AuraUI:CreateWindow(config)
     local Win = Instance.new("Frame") 
     Win.Size = UDim2.new(0, 680, 0, 440) 
     Win.Position = UDim2.new(0.5, -340, 0.5, -220) 
+    Win.BackgroundColor3 = T.Window 
     Win.BackgroundTransparency = 0 
+    Win.BorderSizePixel = 0 
+    Win.ClipsDescendants = true 
     Win.Parent = gui 
     Reg(Win, "BackgroundColor3", "Window") 
     Corner(Win, 6)
     local WinStroke = MakeStroke(Win, T.Border, 1) 
     Reg(WinStroke, "Color", "Border") 
-    -- AddGradient(Win, 45)
+    AddGradient(Win, 45)
 
     local WinShadow = Instance.new("ImageLabel")
     WinShadow.Name = "Shadow"
@@ -224,12 +238,13 @@ function AuraUI:CreateWindow(config)
     local Topbar = Instance.new("Frame") 
     Topbar.Size = UDim2.new(1, 0, 0, 28) 
     Topbar.BackgroundColor3 = T.Topbar 
+    Topbar.BackgroundTransparency = 0 
     Topbar.BorderSizePixel = 0 
     Topbar.ZIndex = 5 
-    Topbar.BackgroundTransparency = 0 
     Topbar.Parent = Win 
     Reg(Topbar, "BackgroundColor3", "Topbar") 
     MakeDraggable(Topbar, Win) 
+    AddGradient(Topbar)
  
     local TopbarLine = Instance.new("Frame") 
     TopbarLine.Size = UDim2.new(1, 0, 0, 1) 

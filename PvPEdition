@@ -249,10 +249,8 @@ function AuraUI:CreateWindow(config)
     TopbarLine.BackgroundColor3 = T.Border 
     TopbarLine.BorderSizePixel = 0 
     TopbarLine.ZIndex = 5 
-    Topbar.Parent = Win 
-    Reg(Topbar, "BackgroundColor3", "Topbar") 
-    MakeDraggable(Topbar, Win) 
-    AddGradient(Topbar) 
+    TopbarLine.Parent = Topbar 
+    Reg(TopbarLine, "BackgroundColor3", "Border") 
  
     local TopAccent = Instance.new("Frame") 
     TopAccent.Size = UDim2.new(0, 3, 1, 0) 
@@ -975,6 +973,7 @@ function AuraUI:CreateWindow(config)
                                 opts.Callback(val)
                             end
                         end)
+                    end
                    
                     local itemCount = #Drp.Values
                     local itemHeight = 24

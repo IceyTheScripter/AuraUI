@@ -12,7 +12,7 @@ local HttpService      = game:GetService("HttpService")
 local Players          = game:GetService("Players") 
 local Debris           = game:GetService("Debris") 
  
-local LocalPlayer = Players.LocalPlayer 
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait() 
 local Mouse       = LocalPlayer:GetMouse() 
  
 local writefile  = writefile  or function() end 
@@ -421,7 +421,7 @@ function AuraUI:CreateWindow(config)
  
     -- CONTINUE IN NEXT PART...
         -- ── AddTab (CONTINUED) ──────────────────────────────────────────────────
-    function WD:AddTab(name) 
+    function WD:AddTab(name, icon) 
         local TD = {Name = name} 
  
         local Btn = Instance.new("TextButton") 
@@ -1123,9 +1123,13 @@ function AuraUI:CreateWindow(config)
                     if opts.Callback then opts.Callback(v) end
                 end
 
+                function Inp:SetValue(v) return self:Set(v) end
+
                 AuraUI.Options[id] = Inp 
                 return Inp 
             end 
+
+            function GB:AddTextInput(id, opts) return self:AddInput(id, opts) end
  
             -- ── Keybind ─────────────────────────────────────────────────────
             function GB:AddKeybind(id, opts) 
@@ -1272,23 +1276,23 @@ function AuraUI:CreateWindow(config)
                         Opt.MouseButton1Click:Connect(function() 
                             PlaySound(AuraUI.Sounds.Click, 0.22, 1.15)  
                             
-                            Drp.Value = val
-                            BtnLbl.Text = tostring(val)
-                            
-                            if not Drp.Multi then
-                                CloseList()
+                            local idx = table.find(MD.Value, val)
+                            if idx then
+                                table.remove(MD.Value, idx)
+                            else
+                                table.insert(MD.Value, val)
                             end
-                           
-                            Build()
+                            
+                            BtnLbl.Text = getLabel()
+                            Build2()
                            
                             if opts.Callback then
-                                opts.Callback(val)
+                                opts.Callback(MD.Value)
                             end
                         end)
                     end
                    
-                    -- NOW this is outside the loop
-                    local itemCount = #Drp.Values
+                    local itemCount = #MD.Values
                     local itemHeight = 24
                     local padding = 8
                     local maxHeight = 200
@@ -1297,9 +1301,9 @@ function AuraUI:CreateWindow(config)
 
                     local abs = BtnF.AbsolutePosition
                     local sz  = BtnF.AbsoluteSize
-                    List.Position = UDim2.new(0, abs.X, 0, abs.Y + sz.Y + 4)
-                    List.Size = UDim2.new(0, sz.X, 0, h)
-                    List.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+                    List2.Position = UDim2.new(0, abs.X, 0, abs.Y + sz.Y + 4)
+                    List2.Size = UDim2.new(0, sz.X, 0, h)
+                    List2.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
                 end
  
                 BtnF.MouseButton1Click:Connect(function() 
@@ -1348,6 +1352,145 @@ function AuraUI:CreateWindow(config)
                 return MD 
             end 
  
+            -- ── ColorPicker ────────────────────────────────────────────────── 
+            function GB:AddColorPicker(id, opts) 
+                local CP = {Value = opts.Default or Color3.fromRGB(255, 255, 255)} 
+                local open = false 
+                local trans = 0 
+ 
+                local Wrap = Instance.new("Frame") 
+                Wrap.Size = UDim2.new(1, 0, 0, 24) 
+                Wrap.BackgroundTransparency = 1 
+                Wrap.ClipsDescendants = true 
+                Wrap.Parent = Cnt 
+ 
+                local Lbl = Instance.new("TextLabel") 
+                Lbl.Size = UDim2.new(1, -38, 1, 0) 
+                Lbl.BackgroundTransparency = 1 
+                Lbl.Text = opts.Title 
+                Lbl.Font = Enum.Font.Gotham 
+                Lbl.TextSize = 13 
+                Lbl.TextXAlignment = Enum.TextXAlignment.Left 
+                Lbl.Parent = Wrap 
+                Reg(Lbl, "TextColor3", "Text") 
+ 
+                local Disp = Instance.new("TextButton") 
+                Disp.Size = UDim2.new(0, 32, 0, 16) 
+                Disp.Position = UDim2.new(1, -32, 0.5, -8) 
+                Disp.BackgroundColor3 = CP.Value 
+                Disp.Text = "" 
+                Disp.AutoButtonColor = false 
+                Disp.Parent = Wrap 
+                Corner(Disp, 4) 
+                local ds = MakeStroke(Disp, AuraUI.Theme.Stroke) 
+                Reg(ds, "Color", "Stroke") 
+ 
+                local Picker = Instance.new("Frame") 
+                Picker.Size = UDim2.new(1, 0, 0, 130) 
+                Picker.Position = UDim2.new(0, 0, 0, 24) 
+                Picker.BackgroundTransparency = 1 
+                Picker.Parent = Wrap 
+ 
+                local function makeS(y, label) 
+                    local row = Instance.new("Frame") 
+                    row.Size = UDim2.new(1, 0, 0, 20) 
+                    row.Position = UDim2.new(0, 0, 0, y) 
+                    row.BackgroundTransparency = 1 
+                    row.Parent = Picker 
+ 
+                    local l = Instance.new("TextLabel") 
+                    l.Size = UDim2.new(0, 24, 1, 0) 
+                    l.BackgroundTransparency = 1 
+                    l.Text = label 
+                    l.Font = Enum.Font.GothamBold; l.TextSize = 10 
+                    l.TextColor3 = Color3.new(0.8, 0.8, 0.8) 
+                    l.Parent = row 
+ 
+                    local bg = Instance.new("Frame") 
+                    bg.Size = UDim2.new(1, -30, 0, 6) 
+                    bg.Position = UDim2.new(0, 26, 0.5, -3) 
+                    bg.BackgroundColor3 = AuraUI.Theme.InputBg 
+                    bg.BorderSizePixel = 0; bg.Parent = row 
+                    Reg(bg, "BackgroundColor3", "InputBg"); Corner(bg, 3) 
+ 
+                    local fill = Instance.new("Frame") 
+                    fill.Size = UDim2.new(0.5, 0, 1, 0) 
+                    fill.BackgroundColor3 = AuraUI.Theme.Primary 
+                    fill.BorderSizePixel = 0; fill.Parent = bg 
+                    Reg(fill, "BackgroundColor3", "Primary"); Corner(fill, 3) 
+ 
+                    local grad = Instance.new("UIGradient"); grad.Parent = fill 
+ 
+                    local trig = Instance.new("TextButton") 
+                    trig.Size = UDim2.new(1, 0, 1, 10) 
+                    trig.Position = UDim2.new(0, 0, 0, -5) 
+                    trig.BackgroundTransparency = 1; trig.Text = ""; trig.Parent = bg 
+ 
+                    return bg, fill, grad, trig 
+                end 
+ 
+                local rB, rF, rG, rT = makeS(5,   "R") 
+                local gB, gF, gG, gT = makeS(30,  "G") 
+                local bB, bF, bG, bT = makeS(55,  "B") 
+                local vB, vF, vG, vT = makeS(80,  "BR") 
+                local tB, tF, tG, tT = makeS(105, "TR") 
+ 
+                local rv, gv, bv, vv = CP.Value.R, CP.Value.G, CP.Value.B, 1 
+ 
+                local function update() 
+                    local final = Color3.fromHSV(Color3.new(rv,gv,bv):ToHSV(), select(2, Color3.new(rv,gv,bv):ToHSV()), vv) 
+                    CP.Value = final 
+                    Disp.BackgroundColor3 = final 
+                    Disp.BackgroundTransparency = trans 
+                    if opts.Callback then opts.Callback(final, trans) end 
+                end 
+ 
+                local function handle(b, f, type, input) 
+                    local p = math.clamp((input.Position.X - b.AbsolutePosition.X) / b.AbsoluteSize.X, 0, 1) 
+                    f.Size = UDim2.new(p, 0, 1, 0) 
+                    if type == "R" then rv = p elseif type == "G" then gv = p elseif type == "B" then bv = p elseif type == "V" then vv = p else trans = p end 
+                    update() 
+                end 
+ 
+                local dr, dg, db, dv, dt = false, false, false, false, false 
+                rT.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dr=true; handle(rB, rF, "R", i) end end) 
+                gT.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dg=true; handle(gB, gF, "G", i) end end) 
+                bT.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then db=true; handle(bB, bF, "B", i) end end) 
+                vT.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dv=true; handle(vB, vF, "V", i) end end) 
+                tT.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dt=true; handle(tB, tF, "T", i) end end) 
+ 
+                UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dr,dg,db,dv,dt = false,false,false,false,false end end) 
+                UserInputService.InputChanged:Connect(function(i) 
+                    if i.UserInputType == Enum.UserInputType.MouseMovement then 
+                        if dr then handle(rB, rF, "R", i) elseif dg then handle(gB, gF, "G", i) elseif db then handle(bB, bF, "B", i) elseif dv then handle(vB, vF, "V", i) elseif dt then handle(tB, tF, "T", i) end 
+                    end 
+                end) 
+ 
+                Disp.MouseButton1Click:Connect(function() 
+                    open = not open 
+                    PlaySound(AuraUI.Sounds.Click, 0.25, open and 1.1 or 0.9) 
+                    Tween(Wrap, {Size = open and UDim2.new(1, 0, 0, 160) or UDim2.new(1, 0, 0, 24)}, 0.2) 
+                    Tween(ds, {Color = open and AuraUI.Theme.Primary or AuraUI.Theme.Stroke}, 0.15) 
+                end) 
+ 
+                function CP:Set(color, tr) 
+                    CP.Value = color; trans = tr or 0 
+                    rv, gv, bv = color.R, color.G, color.B 
+                    vv = select(3, color:ToHSV()) 
+                    rF.Size = UDim2.new(rv, 0, 1, 0) 
+                    gF.Size = UDim2.new(gv, 0, 1, 0) 
+                    bF.Size = UDim2.new(bv, 0, 1, 0) 
+                    vF.Size = UDim2.new(vv, 0, 1, 0) 
+                    tF.Size = UDim2.new(trans, 0, 1, 0) 
+                    Disp.BackgroundColor3 = color 
+                    Disp.BackgroundTransparency = trans 
+                    if opts.Callback then opts.Callback(color, trans) end 
+                end 
+ 
+                AuraUI.Options[id] = CP 
+                return CP 
+            end 
+ 
             function GB:AddLabel(text) 
                 local L = Instance.new("TextLabel") 
                 L.Size = UDim2.new(1, 0, 0, 16); L.BackgroundTransparency = 1 
@@ -1370,6 +1513,7 @@ function AuraUI:CreateWindow(config)
         function TD:AddGroupbox(name)      return MakeGroupbox(TD._LeftCol, name) end 
         function TD:AddLeftGroupbox(name)  return MakeGroupbox(TD._LeftCol, name) end 
         function TD:AddRightGroupbox(name) return MakeGroupbox(TD._RightCol, name) end 
+        function TD:AddSection(name)       return MakeGroupbox(TD._LeftCol, name) end
  
         return TD 
     end

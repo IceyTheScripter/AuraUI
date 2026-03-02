@@ -1270,21 +1270,37 @@ function AuraUI:CreateWindow(config)
                         Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency=0.2}, 0.1) end) 
                         Opt.MouseLeave:Connect(function() Tween(Opt, {BackgroundTransparency=sel and 0.3 or 1}, 0.1) end) 
                         Opt.MouseButton1Click:Connect(function() 
-                            if sel then table.remove(MD.Value, table.find(MD.Value, val)) 
-                            else table.insert(MD.Value, val) end 
-                            BtnLbl.Text = getLabel(); Build2() 
-                            if opts.Callback then opts.Callback(MD.Value) end 
-                        end) 
-                    end 
-                    local itemCount = #MD.Values
-                    local totalHeight = itemCount * 24 + 8
-                    local h = math.min(totalHeight, 200)
+                            PlaySound(AuraUI.Sounds.Click, 0.22, 1.15)  
+                            
+                            Drp.Value = val
+                            BtnLbl.Text = tostring(val)
+                            
+                            if not Drp.Multi then
+                                CloseList()
+                            end
+                           
+                            Build()
+                           
+                            if opts.Callback then
+                                opts.Callback(val)
+                            end
+                        end)
+                    end
+                   
+                    -- NOW this is outside the loop
+                    local itemCount = #Drp.Values
+                    local itemHeight = 24
+                    local padding = 8
+                    local maxHeight = 200
+                    local totalHeight = itemCount * itemHeight + padding
+                    local h = math.min(totalHeight, maxHeight)
+
                     local abs = BtnF.AbsolutePosition
                     local sz  = BtnF.AbsoluteSize
-                    List2.Position = UDim2.new(0, abs.X, 0, abs.Y + sz.Y + 4)
-                    List2.Size = UDim2.new(0, sz.X, 0, h)
-                    List2.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-                end 
+                    List.Position = UDim2.new(0, abs.X, 0, abs.Y + sz.Y + 4)
+                    List.Size = UDim2.new(0, sz.X, 0, h)
+                    List.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+                end
  
                 BtnF.MouseButton1Click:Connect(function() 
                     open2 = not open2

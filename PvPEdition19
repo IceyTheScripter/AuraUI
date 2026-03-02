@@ -790,15 +790,15 @@ function AuraUI:CreateWindow(config)
             end 
  
             -- ── Dropdown (with left/right arrow keys) ───────────────────────── 
+            -- ── Dropdown (Expansion Model) ─────────────────────────────────── 
             function GB:AddDropdown(id, opts) 
                 local Drp = {Value = opts.Default, Values = opts.Values} 
                 local open = false 
-                local focused = false   -- whether this dropdown is keyboard-focused 
- 
+                local focused = false 
                 local Wrap = Instance.new("Frame") 
                 Wrap.Size = UDim2.new(1, 0, 0, 36) 
                 Wrap.BackgroundTransparency = 1 
-                Wrap.ClipsDescendants = false 
+                Wrap.ClipsDescendants = true 
                 Wrap.ZIndex = 10 
                 Wrap.Parent = Cnt 
  
@@ -806,10 +806,8 @@ function AuraUI:CreateWindow(config)
                 Lbl.Size = UDim2.new(1, 0, 0, 13) 
                 Lbl.BackgroundTransparency = 1 
                 Lbl.Text = opts.Title 
-                Lbl.Font = Enum.Font.Gotham 
-                Lbl.TextSize = 11 
+                Lbl.Font = Enum.Font.Gotham; Lbl.TextSize = 11 
                 Lbl.TextXAlignment = Enum.TextXAlignment.Left 
-                Lbl.ZIndex = 10 
                 Lbl.Parent = Wrap 
                 Reg(Lbl, "TextColor3", "TextDim") 
  
@@ -818,89 +816,60 @@ function AuraUI:CreateWindow(config)
                 LeftArrow.Size = UDim2.new(0, 18, 0, 21) 
                 LeftArrow.Position = UDim2.new(0, 0, 0, 14) 
                 LeftArrow.BackgroundColor3 = AuraUI.Theme.InputBg 
-                LeftArrow.AutoButtonColor = false 
-                LeftArrow.Text = "◀" 
-                LeftArrow.Font = Enum.Font.GothamBold 
-                LeftArrow.TextSize = 11 
-                LeftArrow.ZIndex = 10 
+                LeftArrow.AutoButtonColor = false; LeftArrow.Text = "◀" 
+                LeftArrow.Font = Enum.Font.GothamBold; LeftArrow.TextSize = 11 
                 LeftArrow.Parent = Wrap 
-                Reg(LeftArrow, "BackgroundColor3", "InputBg") 
-                Reg(LeftArrow, "TextColor3", "TextMuted") 
+                Reg(LeftArrow, "BackgroundColor3", "InputBg"); Reg(LeftArrow, "TextColor3", "TextMuted") 
                 Corner(LeftArrow, 3) 
  
                 local RightArrow = Instance.new("TextButton") 
                 RightArrow.Size = UDim2.new(0, 18, 0, 21) 
                 RightArrow.Position = UDim2.new(1, -18, 0, 14) 
                 RightArrow.BackgroundColor3 = AuraUI.Theme.InputBg 
-                RightArrow.AutoButtonColor = false 
-                RightArrow.Text = "▶" 
-                RightArrow.Font = Enum.Font.GothamBold 
-                RightArrow.TextSize = 11 
-                RightArrow.ZIndex = 10 
+                RightArrow.AutoButtonColor = false; RightArrow.Text = "▶" 
+                RightArrow.Font = Enum.Font.GothamBold; RightArrow.TextSize = 11 
                 RightArrow.Parent = Wrap 
-                Reg(RightArrow, "BackgroundColor3", "InputBg") 
-                Reg(RightArrow, "TextColor3", "TextMuted") 
+                Reg(RightArrow, "BackgroundColor3", "InputBg"); Reg(RightArrow, "TextColor3", "TextMuted") 
                 Corner(RightArrow, 3) 
  
-                -- Main button (middle, between arrows) 
                 local BtnF = Instance.new("TextButton") 
                 BtnF.Size = UDim2.new(1, -40, 0, 21) 
                 BtnF.Position = UDim2.new(0, 20, 0, 14) 
                 BtnF.BackgroundColor3 = AuraUI.Theme.InputBg 
-                BtnF.AutoButtonColor = false 
-                BtnF.Text = "" 
-                BtnF.ZIndex = 10 
+                BtnF.AutoButtonColor = false; BtnF.Text = "" 
                 BtnF.Parent = Wrap 
-                Reg(BtnF, "BackgroundColor3", "InputBg") 
-                Corner(BtnF, 3) 
-                local bfs = MakeStroke(BtnF, AuraUI.Theme.Stroke) 
-                Reg(bfs, "Color", "Stroke") 
+                Reg(BtnF, "BackgroundColor3", "InputBg"); Corner(BtnF, 3) 
+                local bfs = MakeStroke(BtnF, AuraUI.Theme.Stroke); Reg(bfs, "Color", "Stroke") 
  
                 local BtnLbl = Instance.new("TextLabel") 
                 BtnLbl.Size = UDim2.new(1, -20, 1, 0) 
                 BtnLbl.Position = UDim2.new(0, 6, 0, 0) 
-                BtnLbl.BackgroundTransparency = 1 
-                BtnLbl.Text = tostring(Drp.Value or "None") 
-                BtnLbl.Font = Enum.Font.Gotham 
-                BtnLbl.TextSize = 11 
+                BtnLbl.BackgroundTransparency = 1; BtnLbl.Text = tostring(Drp.Value or "None") 
+                BtnLbl.Font = Enum.Font.Gotham; BtnLbl.TextSize = 11 
                 BtnLbl.TextXAlignment = Enum.TextXAlignment.Left 
-                BtnLbl.ZIndex = 10 
                 BtnLbl.Parent = BtnF 
                 Reg(BtnLbl, "TextColor3", "Text") 
  
                 local ArrowIco = Instance.new("TextLabel") 
-                ArrowIco.Size = UDim2.new(0, 16, 1, 0) 
-                ArrowIco.Position = UDim2.new(1, -16, 0, 0) 
-                ArrowIco.BackgroundTransparency = 1 
-                ArrowIco.Text = "▼" 
-                ArrowIco.Font = Enum.Font.GothamBold 
-                ArrowIco.TextSize = 10 
-                ArrowIco.ZIndex = 10 
+                ArrowIco.Size = UDim2.new(0, 16, 1, 0); ArrowIco.Position = UDim2.new(1, -16, 0, 0) 
+                ArrowIco.BackgroundTransparency = 1; ArrowIco.Text = "▼" 
+                ArrowIco.Font = Enum.Font.GothamBold; ArrowIco.TextSize = 10 
                 ArrowIco.Parent = BtnF 
                 Reg(ArrowIco, "TextColor3", "TextMuted") 
  
-                -- Dropdown list — parented to root ScreenGui to bypass ALL hierarchy issues
-                local List = Instance.new("Frame") 
-                List.Size = UDim2.new(0, 200, 0, 0) 
-                List.BackgroundColor3 = AuraUI.Theme.Groupbox 
-                List.BorderSizePixel = 0 
-                List.ZIndex = 2000 
-                List.Active = true 
-                List.ClipsDescendants = false 
-                List.Visible = false 
-                List.Parent = gui 
-                Reg(List, "BackgroundColor3", "Groupbox") 
-                Corner(List, 4) 
-                local ls = MakeStroke(List, AuraUI.Theme.Stroke) 
-                Reg(ls, "Color", "Stroke") 
-
+                local List = Instance.new("ScrollingFrame") 
+                List.Size = UDim2.new(1, 0, 0, 120) 
+                List.Position = UDim2.new(0, 0, 0, 38) 
+                List.BackgroundTransparency = 1 
+                List.ScrollBarThickness = 2 
+                List.ZIndex = 5 
+                List.Parent = Wrap 
+                Reg(List, "ScrollBarImageColor3", "Primary") 
+ 
                 local ListLayout = Instance.new("UIListLayout") 
                 ListLayout.SortOrder = Enum.SortOrder.LayoutOrder 
+                ListLayout.Padding = UDim.new(0, 2) 
                 ListLayout.Parent = List 
-                local ListPad = Instance.new("UIPadding") 
-                ListPad.PaddingTop=UDim.new(0,3); ListPad.PaddingBottom=UDim.new(0,3) 
-                ListPad.PaddingLeft=UDim.new(0,3); ListPad.PaddingRight=UDim.new(0,3) 
-                ListPad.Parent = List 
 
                 local function GetIndex() 
                     for i, v in ipairs(Drp.Values) do if v == Drp.Value then return i end end 
@@ -913,43 +882,30 @@ function AuraUI:CreateWindow(config)
                     if opts.Callback then opts.Callback(val) end 
                 end 
 
-                local function CloseList()
-                    open = false; List.Visible = false
-                    Wrap.ZIndex = 10
-                    ArrowIco.Text = "▼"
-                    Tween(bfs, {Color = AuraUI.Theme.Stroke}, 0.1)
-                    focused = false
-                end
-
                 local function Build() 
                     for _, c in ipairs(List:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end 
                     for _, val in ipairs(Drp.Values) do 
                         local Opt = Instance.new("TextButton") 
-                        Opt.Size = UDim2.new(1, 0, 0, 24) 
-                        Opt.BackgroundColor3 = AuraUI.Theme.Element 
+                        Opt.Size = UDim2.new(1, -4, 0, 22) 
+                        Opt.BackgroundColor3 = (val == Drp.Value) and AuraUI.Theme.Primary or AuraUI.Theme.Element 
                         Opt.BackgroundTransparency = (val == Drp.Value) and 0.4 or 1 
                         Opt.Text = "  " .. val 
                         Opt.TextColor3 = (val == Drp.Value) and AuraUI.Theme.Primary or AuraUI.Theme.Text 
-                        Opt.Font = Enum.Font.Gotham 
-                        Opt.TextSize = 11 
+                        Opt.Font = Enum.Font.Gotham; Opt.TextSize = 11 
                         Opt.TextXAlignment = Enum.TextXAlignment.Left 
-                        Opt.AutoButtonColor = false 
-                        Opt.ZIndex = 2001 
-                        Opt.Parent = List 
+                        Opt.AutoButtonColor = false; Opt.Parent = List 
                         Corner(Opt, 3) 
                         Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency = 0.3}, 0.1) end) 
                         Opt.MouseLeave:Connect(function() Tween(Opt, {BackgroundTransparency = (val==Drp.Value) and 0.4 or 1}, 0.1) end) 
                         Opt.MouseButton1Click:Connect(function() 
                             PlaySound(AuraUI.Sounds.Click, 0.22, 1.15) 
                             SetValue(val) 
-                            CloseList() 
+                            open = false 
+                            Tween(Wrap, {Size = UDim2.new(1, 0, 0, 36)}, 0.25) 
+                            ArrowIco.Text = "▼" 
                         end) 
                     end 
-                    local h = math.min(#Drp.Values * 24 + 6, 150)
-                    local abs = BtnF.AbsolutePosition
-                    local sz  = BtnF.AbsoluteSize
-                    List.Position = UDim2.new(0, abs.X, 0, abs.Y + sz.Y + 2)
-                    List.Size = UDim2.new(0, sz.X, 0, h)
+                    List.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y) 
                 end 
 
                 -- Open/close 
@@ -967,23 +923,14 @@ function AuraUI:CreateWindow(config)
                     end
                 end) 
  
-                -- Left arrow: cycle previous 
-                local function CyclePrev() 
-                    local idx = GetIndex() 
-                    local newIdx = ((idx - 2) % #Drp.Values) + 1 
-                    SetValue(Drp.Values[newIdx]) 
-                    PlaySound(AuraUI.Sounds.Click, 0.2, 1.05) 
-                    if open then Build() end 
+                local function Cycle(dir) 
+                    local idx = 1 
+                    for i, v in ipairs(Drp.Values) do if v == Drp.Value then idx = i break end end 
+                    local nIdx = ((idx + dir - 1) % #Drp.Values) + 1 
+                    SetValue(Drp.Values[nIdx]) 
+                    PlaySound(AuraUI.Sounds.Click, 0.2, 1.1) 
                 end 
 
-                -- Right arrow: cycle next 
-                local function CycleNext() 
-                    local idx = GetIndex() 
-                    local newIdx = (idx % #Drp.Values) + 1 
-                    SetValue(Drp.Values[newIdx]) 
-                    PlaySound(AuraUI.Sounds.Click, 0.2, 1.1) 
-                    if open then Build() end 
-                end 
 
                 LeftArrow.MouseButton1Click:Connect(CyclePrev) 
                 RightArrow.MouseButton1Click:Connect(CycleNext) 
@@ -1135,15 +1082,15 @@ function AuraUI:CreateWindow(config)
                 return Kb 
             end 
  
-            -- ── Multi-dropdown ──────────────────────────────────────────────── 
+            -- ── Multi-dropdown (Expansion Model) ─────────────────────────── 
             function GB:AddMultiDropdown(id, opts) 
                 local MD = {Value = opts.Default or {}, Values = opts.Values} 
-                local open2 = false 
+                local open = false 
  
                 local Wrap = Instance.new("Frame") 
                 Wrap.Size = UDim2.new(1, 0, 0, 36) 
                 Wrap.BackgroundTransparency = 1 
-                Wrap.ClipsDescendants = false 
+                Wrap.ClipsDescendants = true 
                 Wrap.ZIndex = 10 
                 Wrap.Parent = Cnt 
  
@@ -1153,7 +1100,7 @@ function AuraUI:CreateWindow(config)
                 Lbl.Text = opts.Title 
                 Lbl.Font = Enum.Font.Gotham; Lbl.TextSize = 11 
                 Lbl.TextXAlignment = Enum.TextXAlignment.Left 
-                Lbl.ZIndex = 10; Lbl.Parent = Wrap 
+                Lbl.Parent = Wrap 
                 Reg(Lbl, "TextColor3", "TextDim") 
  
                 local BtnF = Instance.new("TextButton") 
@@ -1161,7 +1108,7 @@ function AuraUI:CreateWindow(config)
                 BtnF.Position = UDim2.new(0, 0, 0, 14) 
                 BtnF.BackgroundColor3 = AuraUI.Theme.InputBg 
                 BtnF.AutoButtonColor = false; BtnF.Text = "" 
-                BtnF.ZIndex = 10; BtnF.Parent = Wrap 
+                BtnF.Parent = Wrap 
                 Reg(BtnF, "BackgroundColor3", "InputBg"); Corner(BtnF, 4) 
                 local bfs2 = MakeStroke(BtnF, AuraUI.Theme.Stroke); Reg(bfs2, "Color", "Stroke") 
  
@@ -1174,99 +1121,81 @@ function AuraUI:CreateWindow(config)
                 BtnLbl.TextTruncate = Enum.TextTruncate.AtEnd 
                 BtnLbl.Font = Enum.Font.Gotham; BtnLbl.TextSize = 11 
                 BtnLbl.TextXAlignment = Enum.TextXAlignment.Left 
-                BtnLbl.ZIndex = 10; BtnLbl.Parent = BtnF 
+                BtnLbl.Parent = BtnF 
                 Reg(BtnLbl, "TextColor3", "Text") 
  
                 local Arr2 = Instance.new("TextLabel") 
                 Arr2.Size = UDim2.new(0, 16, 1, 0); Arr2.Position = UDim2.new(1, -16, 0, 0) 
                 Arr2.BackgroundTransparency = 1; Arr2.Text = "▼" 
                 Arr2.Font = Enum.Font.GothamBold; Arr2.TextSize = 10 
-                Arr2.ZIndex = 10; Arr2.Parent = BtnF 
+                Arr2.Parent = BtnF 
                 Reg(Arr2, "TextColor3", "TextMuted") 
  
-                local List2 = Instance.new("Frame") 
-                List2.BackgroundColor3 = AuraUI.Theme.Groupbox 
-                List2.BorderSizePixel = 0; List2.ZIndex = 2000; List2.Active = true; List2.ClipsDescendants = true 
-                List2.Visible = false; List2.Parent = gui 
-                Reg(List2, "BackgroundColor3", "Groupbox"); Corner(List2, 4) 
-                local ls2 = MakeStroke(List2, AuraUI.Theme.Stroke); Reg(ls2, "Color", "Stroke") 
+                local List = Instance.new("ScrollingFrame") 
+                List.Size = UDim2.new(1, 0, 0, 120) 
+                List.Position = UDim2.new(0, 0, 0, 38) 
+                List.BackgroundTransparency = 1 
+                List.ScrollBarThickness = 2 
+                List.ZIndex = 5 
+                List.Parent = Wrap 
+                Reg(List, "ScrollBarImageColor3", "Primary") 
  
-                local ML = Instance.new("UIListLayout"); ML.SortOrder = Enum.SortOrder.LayoutOrder; ML.Parent = List2 
-                local MP = Instance.new("UIPadding") 
-                MP.PaddingTop=UDim.new(0,3); MP.PaddingBottom=UDim.new(0,3) 
-                MP.PaddingLeft=UDim.new(0,3); MP.PaddingRight=UDim.new(0,3); MP.Parent = List2 
-
+                local ListLayout = Instance.new("UIListLayout") 
+                ListLayout.SortOrder = Enum.SortOrder.LayoutOrder 
+                ListLayout.Padding = UDim.new(0, 2) 
+                ListLayout.Parent = List 
  
-                local function CloseList2()
-                    open2 = false; List2.Visible = false
-                    Wrap.ZIndex = 10; Arr2.Text = "▼"
-                    Tween(bfs2, {Color = AuraUI.Theme.Stroke}, 0.1)
-                end
-
-                local function Build2() 
-                    for _, c in ipairs(List2:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end 
+                local function Build() 
+                    for _, c in ipairs(List:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end 
                     for _, val in ipairs(MD.Values) do 
                         local sel = table.find(MD.Value, val) ~= nil 
                         local Opt = Instance.new("TextButton") 
-                        Opt.Size = UDim2.new(1, 0, 0, 24) 
-                        Opt.BackgroundColor3 = AuraUI.Theme.Element 
+                        Opt.Size = UDim2.new(1, -4, 0, 24) 
+                        Opt.BackgroundColor3 = sel and AuraUI.Theme.Primary or AuraUI.Theme.Element 
                         Opt.BackgroundTransparency = sel and 0.4 or 1 
                         Opt.Text = (sel and "✔ " or "  ") .. val 
                         Opt.TextColor3 = sel and AuraUI.Theme.Primary or AuraUI.Theme.Text 
                         Opt.Font = Enum.Font.Gotham; Opt.TextSize = 11 
                         Opt.TextXAlignment = Enum.TextXAlignment.Left 
-                        Opt.AutoButtonColor = false; Opt.ZIndex = 2001; Opt.Parent = List2 
+                        Opt.AutoButtonColor = false; Opt.Parent = List 
                         Corner(Opt, 3) 
-                        Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency=0.25}, 0.1) end) 
+                        Opt.MouseEnter:Connect(function() Tween(Opt, {BackgroundTransparency=0.3}, 0.1) end) 
                         Opt.MouseLeave:Connect(function() Tween(Opt, {BackgroundTransparency=sel and 0.4 or 1}, 0.1) end) 
                         Opt.MouseButton1Click:Connect(function() 
                             if sel then table.remove(MD.Value, table.find(MD.Value, val)) 
                             else table.insert(MD.Value, val) end 
-                            BtnLbl.Text = getLabel(); Build2() 
+                            BtnLbl.Text = getLabel(); Build() 
                             if opts.Callback then opts.Callback(MD.Value) end 
                         end) 
                     end 
-                    local h = math.min(#MD.Values * 24 + 6, 150)
-                    local abs = BtnF.AbsolutePosition
-                    local sz  = BtnF.AbsoluteSize
-                    List2.Position = UDim2.new(0, abs.X, 0, abs.Y + sz.Y + 2)
-                    List2.Size = UDim2.new(0, sz.X, 0, h)
+                    List.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y) 
                 end 
  
                 BtnF.MouseButton1Click:Connect(function() 
-                    open2 = not open2
-                    if open2 then
-                        Wrap.ZIndex = 100
-                        Build2(); List2.Visible = true
-                        Arr2.Text = "▲"
-                        Tween(bfs2, {Color = AuraUI.Theme.Primary}, 0.1)
-                    else
-                        CloseList2()
-                    end
+                    open = not open 
+                    if open then 
+                        Build() 
+                        local h = math.min(ListLayout.AbsoluteContentSize.Y + 40, 160) 
+                        Tween(Wrap, {Size = UDim2.new(1, 0, 0, h)}, 0.3) 
+                        Arr2.Text = "▲" 
+                        Tween(bfs2, {Color = AuraUI.Theme.Primary}, 0.1) 
+                    else 
+                        Tween(Wrap, {Size = UDim2.new(1, 0, 0, 36)}, 0.25) 
+                        Arr2.Text = "▼" 
+                        Tween(bfs2, {Color = AuraUI.Theme.Stroke}, 0.1) 
+                    end 
                 end) 
-
-                -- Close on any click outside (deferred so option click fires first)
-                UserInputService.InputBegan:Connect(function(inp)
-                    if inp.UserInputType == Enum.UserInputType.MouseButton1 and open2 then
-                        task.defer(function()
-                            if not open2 then return end
-                            local mp = UserInputService:GetMouseLocation()
-                            local a1 = List2.AbsolutePosition; local s1 = List2.AbsoluteSize
-                            local a2 = BtnF.AbsolutePosition;  local s2 = BtnF.AbsoluteSize
-                            local inList = mp.X >= a1.X and mp.X <= a1.X+s1.X and mp.Y >= a1.Y and mp.Y <= a1.Y+s1.Y
-                            local inBtn  = mp.X >= a2.X and mp.X <= a2.X+s2.X and mp.Y >= a2.Y and mp.Y <= a2.Y+s2.Y
-                            if not inList and not inBtn then
-                                CloseList2()
-                            end
-                        end)
-                    end
-                end)
-                function MD:Set(v)
-                    MD.Value = v
-                    BtnLbl.Text = getLabel()
-                    if opts.Callback then opts.Callback(v) end
-                end
-
+ 
+                function MD:Refresh(newVals) 
+                    MD.Values = newVals or MD.Values 
+                    local nVal = {} 
+                    for _, v in ipairs(MD.Value) do if table.find(MD.Values, v) then table.insert(nVal, v) end end 
+                    MD.Value = nVal; BtnLbl.Text = getLabel() 
+                    if open then Build() end 
+                end 
+ 
+                function MD:Set(v) MD.Value = v; BtnLbl.Text = getLabel(); if open then Build() end end 
+ 
                 AuraUI.Options[id] = MD 
                 return MD 
             end 

@@ -871,10 +871,6 @@ function AuraUI:CreateWindow(config)
                 ListLayout.Padding = UDim.new(0, 2) 
                 ListLayout.Parent = List 
 
-                local function GetIndex() 
-                    for i, v in ipairs(Drp.Values) do if v == Drp.Value then return i end end 
-                    return 1 
-                end 
 
                 local function SetValue(val) 
                     Drp.Value = val 
@@ -912,7 +908,7 @@ function AuraUI:CreateWindow(config)
                     open = not open 
                     if open then 
                         Build() 
-                        local h = math.min(ListLayout.AbsoluteContentSize.Y + 40, 160) 
+                        local h = math.min(#Drp.Values * 24 + 40, 180) 
                         Tween(Wrap, {Size = UDim2.new(1, 0, 0, h)}, 0.3) 
                         ArrowIco.Text = "▲" 
                         focused = true 
@@ -1157,7 +1153,7 @@ function AuraUI:CreateWindow(config)
                     open = not open 
                     if open then 
                         Build() 
-                        local h = math.min(ListLayout.AbsoluteContentSize.Y + 40, 160) 
+                        local h = math.min(#MD.Values * 24 + 40, 180) 
                         Tween(Wrap, {Size = UDim2.new(1, 0, 0, h)}, 0.3) 
                         Arr2.Text = "▲" 
                         Tween(bfs2, {Color = AuraUI.Theme.Primary}, 0.1) 
